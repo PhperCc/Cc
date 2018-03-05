@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="renderer" content="webkit">
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=0.7, maximum-scale=0.7">
+	<title>碾压机车载平板 - ENHRDC</title>
+	<link rel="stylesheet" href="/css/draw.css">
+	<link rel="stylesheet" href="/fonts/font-awesome/css/font-awesome.min.css">
+	<style>
+		/* 控制页面样式 */
+		.btn,
+		.btn:visited {
+			background: linear-gradient(to bottom, #000 0%, #666 80%) #222;
+			display: inline-block;
+			padding: 7px 10px;
+			color: #fff;
+			text-decoration: none;
+			border-radius: 5px;
+			border: 0;
+			position: relative;
+			cursor: pointer;
+			letter-spacing: 2px;
+			margin-top: 5px;
+			box-shadow: 0 0 3px #fff;
+			opacity: 0.9;
+			font-size: 12px;
+			text-align: center;
+			outline: 0;
+		}
+
+		.btn:hover {
+			opacity: 1;
+		}
+
+		.btn:active {
+			top: 1px;
+		}
+
+		.green.btn,
+		.green.btn:visited {
+			background: linear-gradient(to bottom, #009900 0%, #00CC00 80%) #009900;
+		}
+
+		.red.btn,
+		.red.btn:visited {
+			background: linear-gradient(to bottom, #990000 0%, #FF3333 80%) #990000;
+		}
+
+		.blue.btn,
+		.blue.btn:visited {
+			background: linear-gradient(to bottom, #003399 0%, #0066FF 80%) #003399;
+		}
+
+		.yellow.btn,
+		.yellow.btn:visited {
+			background: linear-gradient(to bottom, #CC6600 0%, #FF9900 80%) #CC6600;
+		}
+
+		#divDrawType ul {
+			padding: 0;
+			margin: 0;
+			width: 80px;
+			border-radius: 5px;
+			overflow: hidden;
+			line-height: 2;
+			letter-spacing: 1px;
+			border: solid 5px rgba(125, 125, 125, 0.5);
+			box-shadow: 0 0 5px #fff;
+		}
+
+		#divDrawType ul li {
+			display: block;
+			text-align: center;
+			font-size: 14px;
+			cursor: pointer;
+			background: #000;
+			color: #ddd;
+			border-top: solid 1px #999;
+			background: linear-gradient(to bottom, #000 0%, #666 80%) #222;
+		}
+
+		#divDrawType ul li:first-child {
+			border-top: 0;
+		}
+
+		#divDrawType ul li.active {
+			background: linear-gradient(to bottom, #006600 0%, #009900 80%) #006600;
+			color: #fff;
+		}
+	</style>
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/hammer.min.js"></script>
+    <script type="text/javascript" src="/js/ServiceApi.js"></script>
+	<script type="text/javascript" src="/js/jsql.js"></script>
+	<script type="text/javascript" src="/js/draw.js"></script>
+	<script type="text/javascript" src="/js/draw_data.js"></script>
+</head>
+<body>
+	<div id="divMain"></div>
+	<div class="tool" style="bottom:10px; right:10px;">
+		<button class="btn blue" onclick="draw.resetDraw();"><i class="fa fa-refresh fa-fw"></i> 刷新</button><br>
+		<button class="btn blue" onclick="draw.zoom(true);"><i class="fa fa-search-plus fa-fw"></i> 放大</button><br>
+		<button class="btn blue" onclick="draw.zoom(false);"><i class="fa fa-search-minus fa-fw"></i> 缩小</button><br>
+		<div style="height:10px;"></div>
+		<button class="btn yellow" onclick="draw.setConfig({backgroundColor:'#000', textColor:'#fff'});"><i class="fa fa fa-circle fa-fw"></i> 黑色</button><br>
+		<button class="btn yellow" onclick="draw.setConfig({backgroundColor:'#fff', textColor:'#000'});"><i class="fa fa fa-circle-o fa-fw"></i> 白色</button><br>
+		<button class="btn red" onclick="clearData();"><i class="fa fa-trash fa-fw"></i> 清空</button><br>
+	</div>
+	<div id="divDrawType" class="tool" style="top:10px; right:10px;">
+		<ul>
+			<li data-value="0"><i class="fa fa-random fa-fw"></i> 轨迹</li>
+			<li data-value="1"><i class="fa fa-google-wallet fa-fw"></i> 路径</li>
+			<li data-value="2"><i class="fa fa-outdent fa-fw"></i> 速度</li>
+			<li data-value="3" class="active"><i class="fa fa-align-center fa-fw"></i> 遍数</li>
+		</ul>
+	</div>
+
+	<script type="text/javascript">
+	var db = new JSql();
+	db.runList([
+		'CREATE TABLE IF NOT EXISTS gps_list(id, car_no, lon NUMBER, lat NUMBER, deg NUMBER, last_id, data )',
+		'DELETE FROM gps_list WHERE rowid < (SELECT MAX(rowid) FROM gps_list) - 10000',
+	]);
+
+	var option = {
+		isDebug: true,
+		canDrag: true,
+		zoomRate:30,
+		zoomRateMin:10,
+        isGpsFilter:false
+	};
+	var draw = new Draw('divMain', 108, 34, option);
+
+    var carNo = null, carWidth = null;
+    ServiceApi.request("SysConfig.get", {key: "device_name", default: ""}, function($reqSeq, $result, $info, $data){
+        carNo = $data;
+        console.log("carNo: " + carNo);
+    });
+
+    ServiceApi.request("ServiceConfig.get", {module: "Roller", service: "RollerCalc", key: "car_width", default: 2.4}, function($reqSeq, $result, $info, $data){
+        carWidth = $data;
+        console.log("carWidth: " + carWidth);
+    });
+
+    var $waitApiInterval = window.setInterval(function(){
+        if(carNo != null && carWidth != null)
+        {
+            window.clearInterval($waitApiInterval);
+            start();
+        }
+    }, 200);
+
+    function start()
+    {
+        GpsDrawData.draw = draw;
+        GpsDrawData.trackCarNo = carNo;
+        GpsDrawData.trackType = 'center';
+        GpsDrawData.drawType = parseInt($('#divDrawType .active').data('value'));
+        GpsDrawData.dataColorRange = [
+            new ColorRange(0, 1, new ColorRgb(0, 0, 255), new ColorRgb(155, 155, 255)),
+            new ColorRange(1, 2, new ColorRgb(0, 155, 0), new ColorRgb(0, 255, 0)),
+            new ColorRange(2, 2, new ColorRgb(255, 155, 155), new ColorRgb(255, 0, 0)),
+        ];
+        GpsDrawData.carUpdate([{
+            no: carNo,
+            lon: 108,
+            lat: 34,
+            deg: 0,
+            carWidth: carWidth,
+            info: '',
+            isOnline:true,
+        }]);
+        
+        var isRun = false;
+        var lastTime = '';
+        // 从数据库获取历史数据
+        db.run('SELECT * FROM gps_list', function(res){
+            if (res.rows.length > 0)
+            {
+                GpsDrawData.carGpsList = [];
+                for (var i=0; i<res.rows.length; i++)
+                {
+                    GpsDrawData.carGpsList.push(res.rows.item(i));
+                }
+                updateLast();
+            }
+            
+            // 获取实时GPS数据
+            window.setInterval(function(){
+                if (isRun) return;
+                isRun = true;
+
+                lastTime = '';
+                var last = GpsDrawData.carGpsList[GpsDrawData.carGpsList.length - 1];
+                if(last && last.id) lastTime = last.id;
+                console.log('lastTime: ' + lastTime);
+                $.ajax({
+                    url: '/index.php?um=roller&ua=get_pad_data&last_time=' + lastTime + '&rnd=' + Math.random(),
+                    type: 'POST',
+                    /*
+                    data: {
+                        last_time:lastTime
+                    },
+                    */
+                    dataType: 'json',
+                    success: function (res) {
+                        isRun = false;
+                        if (res.result == 1 && res.data.length > 0) {
+                            addGpsList(res.data);
+                            GpsDrawData.carGpsList = GpsDrawData.carGpsList.concat(res.data);
+                            updateLast();
+                        }
+                    },
+                    error: function (xh, err) {
+                        isRun = false;
+                        console.error(err);
+                    }
+                });
+            }, 1000);
+        });
+    }
+
+	function updateLast()
+	{
+		if (GpsDrawData.carGpsList.length == 0)
+		{
+			return;
+		}
+
+		var last = GpsDrawData.carGpsList[GpsDrawData.carGpsList.length - 1];
+		var arr = last.data.split(',');
+		GpsDrawData.carUpdate([{
+			no: last.car_no,
+			lon: last.lon,
+			lat: last.lat,
+			deg: last.deg,
+			info: '速度: ' + parseFloat(arr[0]) + 'km/h<br />ECV: ' + Math.round(parseFloat(arr[1])) + '%',
+		}]);
+
+		draw.resetDraw();
+	}
+
+	function addGpsList(list)
+	{
+		if (!list) return;
+
+		var key_list = [];
+		for (var key in list[0]) {
+			key_list.push(key);
+		}
+
+		var gps_list = [];
+		for (var k in list) {
+			var val_list = [];
+			for (var kk in list[k]) {
+				val_list.push("'" + list[k][kk] + "'");
+			}
+			gps_list.push('(' + val_list.join(',') + ')')
+		}
+
+		var sql = "INSERT INTO gps_list (" + key_list.join(',') + ") VALUES " + gps_list.join(',');
+		db.run(sql);
+	}
+
+	function clearData()
+	{
+		if (confirm('确认要清空所有数据吗？') == false)
+		{
+			return;
+		}
+
+		db.run('DELETE FROM gps_list');
+		GpsDrawData.carGpsList = [];
+		draw.resetDraw();
+	}
+
+	$(function () {
+		$('#divDrawType li').click(function () {
+			GpsDrawData.drawType = parseInt($(this).data('value'));
+			draw.resetDraw();
+			$('#divDrawType li').removeClass('active');
+			$(this).addClass('active');
+		});
+	});
+	</script>
+
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+<form id="frmItem" class="form-search" method="get">
+    <input type="hidden" name="um" value="{ $model }" />
+    <input type="hidden" name="ua" value="{ $action }" />
+    <select id="file_name" name="file_name"  class="input-xlarge">
+    { foreach from=$log_files item=file }
+    <option value="{ $file.name }" { if $file_name eq $file.name }selected{ /if }>{ $file.name } { $file.size }</option>
+    { /foreach }
+    </select>
+
+    <input type="hidden" id="action" name="action" value="" />
+    <input type="button" value="删除" id="delete" title="删除这个文件" class="btn btn btn-danger"/>
+</form>
+<script type="text/javascript">
+$('#file_name').change(function(){
+    $('#frmItem').submit();
+});
+$('#delete').click(function(){
+    $('#action').val('delete');
+    $('#frmItem').submit();
+});
+</script>
+
+<textarea class="input-xxxlarge" style="height:460px;">
+{ foreach from=$lines item=line }{ $line }{ /foreach }
+</textarea>

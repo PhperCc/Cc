@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="renderer" content="webkit">
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=0.7, maximum-scale=0.7">
+	<title>SQLITE 浏览器</title>
+	<style>
+		table {
+			*border-collapse: collapse;
+			/* IE7 and lower */
+			border-spacing: 0;
+		}
+
+
+		.table {
+			border: solid #ccc 1px;
+			box-shadow: 0 1px 1px #ccc;
+			font-size: 12px;
+			font-family: Courier New, Courier, monospace;
+		}
+
+
+		.table .highlight,
+		.table tr:hover {
+			background: #ddd;
+		}
+
+
+		.table td,
+		.table th {
+			border-left: 1px solid #ccc;
+			border-top: 1px solid #ccc;
+			padding: 2px 5px;
+			text-align: left;
+		}
+
+
+		.table th {
+			background-color: #dce9f9;
+			background-image: linear-gradient(top, #ebf3fc, #dce9f9);
+			box-shadow: 0 1px 0 rgba(255, 255, 255, .8) inset;
+			border-top: none;
+			text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+		}
+
+
+		.table td:first-child,
+		.table th:first-child {
+			border-left: none;
+		}
+	</style>
+	<script src="/js/jquery.min.js"></script>
+
+	<script>
+		var db = null;
+		function openDb(dbName) {
+			dbName = dbName || 'db';
+			db = openDatabase(dbName, '1.0', 'ENH_sqlite DB', 200 * 1024 * 1024);
+			console.log(db);
+		}
+
+		var isRun = false;
+		function runSql(sql) {
+			if (db == null) {
+				openDb();
+				if (db == null) return;
+			}
+			if (!sql) return;
+			if (isRun) return;
+			isRun = true;
+
+			console.time('run');
+			db.transaction(function (tx) {
+				tx.executeSql(sql, [], function (tx, res) {
+					isRun = false;
+					console.timeEnd('run');
+					console.log(res);
+					if (res.rowsAffected > 0) {
+						$('#divInfo').css('color', '').html('影响' + res.rowsAffected + '行');
+						showTable([]);
+					}
+					else {
+						$('#divInfo').css('color', '').html('获取' + res.rows.length + '条数据');
+						showTable(res.rows);
+					}
+				}, function (tx, err) {
+					isRun = false;
+					console.timeEnd('run');
+					console.error(err);
+					$('#divInfo').css('color', 'red').html(err.message);
+				});
+			});
+		}
+
+		function showTable(rows) {
+			$('#tbList thead').html('');
+			$('#tbList tbody').html('');
+			if (rows.length == 0) return;
+
+			var tr = $('<tr></tr>');
+			for (var k in rows.item(0)) {
+				tr.append('<th>' + k + '</th>');
+			}
+			$('#tbList thead').append(tr);
+
+			var html = '';
+			for (var i=0; i<rows.length; i++) {
+				var r = rows.item(i);
+				html += '<tr>';
+				for (var kk in r) {
+					html += '<td>' + htmlEncode(r[kk]) + '</td>';
+				}
+				html += '</tr>';
+			}
+			$('#tbList tbody').append(html);
+		}
+
+		function htmlEncode(str) {
+			var ele = document.createElement('span');
+			ele.appendChild(document.createTextNode(str));
+			return ele.innerHTML;
+		}
+		function htmlDecode(str) {
+			var ele = document.createElement('span');
+			ele.innerHTML = str;
+			return ele.textContent;
+		}
+
+		var id = 0;
+		function getGps() {
+			id++;
+			var gps = {
+				id: id,
+				car_no: 'RL0101',
+				lon: 108 + Math.random(),
+				lat: 34 + Math.random(),
+				deg: Math.round(Math.random() * 360),
+				last_id: id - 1,
+				data: '' + (1 + Math.random()) + ',100',
+			};
+
+			return gps;
+		}
+
+		function addGpsList(list) {
+			if (!list) return;
+
+			var key_list = [];
+			for (var key in list[0]) {
+				key_list.push(key);
+			}
+
+			var gps_list = [];
+			for (var k in list) {
+				var val_list = [];
+				for (var kk in list[k]) {
+					val_list.push("'" + list[k][kk] + "'");
+				}
+				gps_list.push('(' + val_list.join(',') + ')')
+			}
+
+			var sql = "INSERT INTO gps_list (" + key_list.join(',') + ") VALUES " + gps_list.join(',');
+			runSql(sql);
+		}
+	</script>
+</head>
+
+<body style="line-height: 1.5;">
+	<h3 style="margin:5px 0;">JS sqlite 数据库操作</h3>
+	<ul style="font-size:12px; color:gray; padding-left:15px;">
+		<li>创建：CREATE TABLE IF NOT EXISTS LOGS (id unique, log)</li>
+		<li>插入：INSERT INTO LOGS (id, log) VALUES (1, "foobar")</li>
+		<li>查询：SELECT * FROM LOGS</li>
+		<li>删除：DELETE FROM LOGS WHERE id = 1</li>
+		<li>所有表：SELECT * FROM sqlite_master WHERE type="table";</li>
+		<li>删除表：DROP TABLE LOGS</li>
+		<li>类型：INTEGER,TEXT,REAL,NUMERIC</li>
+	</ul>
+	<input id="txtDbName" type="text" value="db" /> <input type="button" value="连接数据库" onclick="openDb($('#txtDbName').val());" /><br>
+	<input id="txtSql" type="text" value="SELECT * FROM LOGS" style="width:600px;" />
+	<input type="button" value="执行SQL" onclick="runSql($('#txtSql').val());" /><br>
+	<input type="button" value="创建GPS数据库" onclick="runSql('CREATE TABLE IF NOT EXISTS gps_list(id, car_no, lon NUMBER, lat NUMBER, deg NUMBER, last_id, data)');"
+	/>
+	<input type="button" value="添加GPS数据" onclick="addGpsList([getGps(), getGps()]);" />
+	<div id="divInfo"></div>
+	<table id="tbList" class="table">
+		<thead>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</body>
+
+</html>
+
+<!--
+常见GPS数据库
+CREATE TABLE IF NOT EXISTS gps_list(id, car_no, lon NUMBER, lat NUMBER, deg NUMBER, last_id, data)
+-->

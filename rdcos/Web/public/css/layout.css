@@ -1,0 +1,48 @@
+@charset "utf-8";
+/* CSS Document */
+/* 查询表单 */
+.check_form { background:#fff; padding:15px;}
+.check_form > div { margin-bottom:3px; border-bottom:1px solid #e5e5e5; padding-bottom:3px; overflow:hidden;}
+.check_form > div > label {min-width:70px; width: 90px; margin-right:4%; display:inline-block; font-size:1rem;line-height:2rem; height: 30px; float:left; color: #333;border-right: 1px solid #eee; padding-right: 2%;}
+.check_form > div   input[type=text], .login_form input[type=password], .reg_form input[type=password]{font-size:1rem !important; border:0; color:#0366cc !important; float:left;  -webkit-appearance: none; background-color: white; -webkit-tap-highlight-color: rgba(0,0,0,0); height: 20px; line-height: 2rem; }
+
+.check_form > div   input::-webkit-input-placeholder { font-size:1rem;color:#a1a1a1}
+.check_form > p  input[type=submit] { width:100%; margin:1rem auto; font-size:18px; height:46px; background:#fdd922; color:#565656; border:1px solid #e0bc27; border-radius:4px;
+    -webkit-appearance: none; appearance: none;}
+
+.divimg{
+  position: relative;
+}
+
+.div-img{
+  position:absolute;
+  z-index: 999;
+  top: 0px;
+  left: 0px;
+  display: none;
+}
+
+.prompts {
+    width: 100%;
+    font-size: 14px;
+    text-align: left;
+    color:#ff9900;
+    margin-top: -5px; 
+    margin-bottom: 0px; 
+    padding: 0px 0px 0px 15px; 
+    background-color: #eee;
+    display: none;
+  }
+
+  .enh-chart {
+    width: 100%;
+    max-width:100%;
+    height:500px;
+    border:solid 2px #ddd; 
+    margin-bottom:10px;
+    margin-top: 50px;
+  }
+  @media (max-width: 600px) {
+  .enh-chart {height:300px;}
+}
+

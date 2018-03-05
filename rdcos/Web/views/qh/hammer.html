@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>设备尺寸</title>
+    <link rel="stylesheet" href="./css/main.css" type="text/css" media="screen">
+    <!-- Color Scheme -->
+    <link rel="stylesheet" href="./css/color.css" type="text/css" media="screen">
+    <link href="./css/layout.css" rel="stylesheet">
+</head>
+<body>
+    <div id="st-container" class="st-container">
+        <nav class="st-menu st-effect-4">
+            <ul>
+                <li><h1>ENH</h1></li>
+              <li><a class="ico home selected" href="?um=qh&ua=work">工作现场</a></li>
+              <li><a class="ico services" href="?um=qh&ua=calibration">设备校准</a></li>
+              <li><a class="ico gallery" href="?um=qh&ua=conf">基本设置</a></li>
+              <li><a class="ico portfolio" href="?um=qh&ua=hammer">设备参数</a></li>
+            </ul>
+        </nav>
+        <div class="st-pusher">
+            <div class="st-content">
+                <div class="st-content-inner">
+                <!-- Top Navigation -->
+                <header>
+                    <div id="st-trigger-effects">
+                        <button data-effect="st-effect-4" id="menu-bars"></button>
+                    </div>
+                    <h1>设备参数</h1>
+                </header>
+                <div class="content">
+                    <div class="dcm-left">
+                        <div class="divimg">
+                            <img  src="./img/xiaozhun1.png"  alt=""  width="100%" id="tianxian" >
+                            <img  src="./img/tianxianX2.png" alt=""  width="100%" id="tianxian1" class="div-img"  ><img  src="./img/tianxianY2.png" alt=""  width="100%" id="tianxian2" class="div-img" >
+                            <img  src="./img/tianxianX1.png" alt=""  width="100%" id="tianxian4" class="div-img" >
+                            <img  src="./img/tianxiany1.png"  alt="" width="100%"  id="tianxian5" class="div-img" >
+                            
+                            <img  src="./img/xiaozhunH1.png" alt=""   width="100%" id="tianxian6" class="div-img" >
+                        </div>
+                        <div class="divimg" style="display: none;">
+                            <img  src="./img/xiaozhun.png"  alt=""  width="100%">
+                        </div>
+                    </div>
+                    <div class="dcm-right">
+                        <fieldset class="text-center">
+                            <legend align="center">设备尺寸</legend>
+                            <div id="signinform" class="check_form">
+                                <div class="setting_list" id="frontPointAtLeft">
+<label>前天线安装方位</label>
+<div style="width: 100px;float: left; margin-top: 15px;">
+<input type="radio"  placeholder="前天线安装位置" name="frontPointAtLeft" value="1" { if $QHconfig.frontPointAtLeft == 1 } checked="checked" { /if }/>
+    <span>左边</span>
+</div>
+<div style="width: 100px;float: left; margin-top: 15px;">
+<input type="radio"  placeholder="前天线安装位置" name="frontPointAtLeft" value="0" { if $QHconfig.frontPointAtLeft == 0 } checked="checked"{ /if }/>
+    <span>右边</span>
+</div>
+
+</div>
+
+<div class="setting_list">
+<label>前天线左右偏移量</label>
+<input type="text" placeholder="前天线左右偏移量" id="frontPointX" value="{ $QHconfig.frontPointX }" />
+<span class="unit">米</span>
+</div>
+
+<div class="setting_list">
+<label>前天线前后偏移量</label>
+<input type="text" placeholder="前天线左右偏移量" id="frontPointY" value="{ $QHconfig.frontPointY }" />
+<span class="unit">米</span>
+</div>
+
+<div class="setting_list" id="backPointAtLeft">
+<label>后天线安装方位</label>
+ <div style="width: 100px;float: left; margin-top: 15px;">
+    <input type="radio"  placeholder="后天线安装位置" name="backPointAtLeft"  value="1" { if $QHconfig.backPointAtLeft=="1" } checked="checked" { /if } /><span>左边</span>
+</div>
+<div style="width: 100px;float: left; margin-top: 15px;">
+    <input type="radio"  placeholder="后天线安装位置" name="backPointAtLeft"  value="0" { if $QHconfig.backPointAtLeft=="0" }
+    checked="checked"
+    { /if }/><span>右边</span>
+</div>
+
+</div>
+<div class="setting_list">
+<label>后天线左右偏移量</label>
+<input type="text" placeholder="后天线左右偏移量" id="backPointX" value="{ $QHconfig.backPointX }" />
+<span class="unit">米</span>
+</div>
+
+<div class="setting_list">
+<label>后天线前后偏移量</label>
+<input type="text" placeholder="后天线前后偏移量" id="backPointY" value="{ $QHconfig.backPointY }" />
+<span class="unit">米</span>
+</div>
+<div class="setting_list">
+<label>后天线到地面距离</label>
+<input type="text" placeholder="强夯机高" id="backPointHi" value="{ $QHconfig.backPointHi }" />
+<span class="unit">米</span>
+</div>
+<button id="button_rth">提交保存并应用</button>
+</div>
+                        </fieldset>
+                        </br>
+                        </br>
+                        </br>
+                    </div>
+                </div>
+                </div><!-- /st-content-inner -->
+            </div><!-- /st-content -->
+        </div><!-- /st-pusher -->
+    </div><!-- /st-container -->
+
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/classie.js"></script>
+
+    <script src="./js/sidebarEffects.js"></script>
+    <script>
+        var url = "?um=qh&ua=hammer";
+        $("#button_rth").click(function(){
+            data = {
+            "frontPointAtLeft" : $("#frontPointAtLeft input:checked").val(),
+            "frontPointX" : $("#frontPointX").val(),
+            "frontPointY" : $("#frontPointY").val(),
+            "backPointAtLeft" :  $("#backPointAtLeft input:checked").val(),
+            "backPointX" : $("#backPointX").val(),
+            "backPointY" : $("#backPointY").val(),
+            "backPointHi" : $("#backPointHi").val(),
+            }
+            confsave(data);
+        });
+        function confsave(data)
+        {   
+            $.post(url,data,function(data){
+                if(data == 1)location.reload();
+                // console.log(data);
+            });
+        }
+
+        $("input").click(function(){
+            var data = $(this).attr('id');
+            $(".div-img").hide();
+            if (data=="frontPointX") {
+                $("#tianxian1").show();
+            }else if (data=="frontPointY") {
+                $("#tianxian2").show();
+            }else if (data=="backPointX") {
+                $("#tianxian4").show();
+            }else if (data=="backPointY") {
+                $("#tianxian5").show();
+            }else if (data=="backPointHi") {
+                $("#tianxian6").show();
+            }
+        });
+    </script>
+
+</body>
+
+</html>

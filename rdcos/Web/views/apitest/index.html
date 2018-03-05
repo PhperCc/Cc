@@ -1,0 +1,93 @@
+<script type="text/javascript" src="./public/js/GpsPoint.js"></script>
+<form class="form-horizontal">
+<div class="page-header"><h4>{ $reflection.desc }</h4></div>
+<i>{ $reflection.sign }</i>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr><th style="width:150px;">参数</th><th style="width:200px;">值</th><th style="width:50px;">可省略</th><th style="width:100px;">类型</th><th>说明</th></tr>
+    </thead>
+    <tbody>
+        { foreach from=$reflection.params item=param key=param_name }
+        <tr>
+            <td>{ $param_name }</td>
+            <td><input type="text" { if $param.omitable neq 1 }required{ /if } id="param_{ $param_name }" class="input-xlarge" /></td>
+            <td style="text-align:center;">{ if $param.omitable eq 1 }是{ /if }</td>
+            <td style="text-align:center">{ $param.type }</td>
+            <td>{ $param.desc }</td>
+        </tr>
+        { /foreach }
+        <tr>
+            <td colspan="3" style="text-align:center">填写参数后， 点击按钮执行</td>
+            <td style="text-align:center"><a type="button" id="execute" class="btn btn-primary"><i class="icon-chevron-right icon-white"></i> 执行</a></td>
+            <td id="execute_info"></td>
+        </tr>
+    </table>
+    <table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>提交内容</th>
+            <th>返回内容</th>
+    </thead>
+        <tr>
+            <td style="width:400px;"><pre>{ $reflection.example }</pre></td>
+            <td><textarea id="execute_result" style="width:98%;height:200px;"></textarea></td>
+        </tr>
+    </tbody>
+</table>
+
+</form>
+<script type="text/javascript" src='./public/js/ServiceApi.js'></script>
+<script type="text/javascript">
+
+var $execute_start_time = 0;
+
+$(function(){
+    $('#execute').click(function()
+    {
+        $execute_start_time = new Date();
+        var $params = {};
+        { foreach from=$reflection.params item=param key=param_name }
+        { if $param.omitable neq 1 }
+        if($('#param_{ $param_name }').val().trim() == '')
+        {
+            $('#param_{ $param_name }').focus();
+            return;
+        }
+        { /if }
+        $params.{ $param_name } = $('#param_{ $param_name }').val();
+        { /foreach }
+        ServiceApi.request("{ $api }.{ $method }", $params, function($reqSeq, $result, $info, $data)
+        {
+            var $used_ms = new Date().getTime() - $execute_start_time.getTime();
+            $('#execute_info').html("执行耗时: " + $used_ms + " ms");
+            var $execute_result = "";
+            $execute_result += "seq: " + $reqSeq + "\n";
+            $execute_result += "result: " + $result + "\n";
+            $execute_result += "info: " + $info + "\n";
+            // $execute_result += "data: " + jsonStringify($data, 8) + "\n";
+            $execute_result += "data: " + JSON.stringify($data) + "\n";
+
+            $('#execute_result').val($execute_result);
+            $('#execute').prop('disabled', false);
+        });
+        
+        $('#execute_info').html('正在执行...');
+        $('#execute').prop('disabled', true);
+        $('#execute_result').val('正在执行...');
+    });
+});
+
+function jsonStringify(data,space){
+    var seen=[];
+    return JSON.stringify(data,function(key,val){
+        if(!val||typeof val !=='object'){
+            return val;
+        }
+        if(seen.indexOf(val)!==-1){
+            return '[Circular]';
+        }
+        seen.push(val);
+        return val;
+    },space);
+}
+</script>

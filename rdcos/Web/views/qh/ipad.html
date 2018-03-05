@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>ENH rdc_carPathDraw</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <style>
+    body{overflow: hidden; margin: 0px; padding: 0px; top: 0px; left: 0px; right: 0px; bottom: 0px; position: fixed; font-size:12px;}
+    .canvas{width:100%; height:100%; position: absolute; top:0; left:0;}
+    .tool {position: absolute;}
+    #divInfo {font-size:10px;}
+    #divInfo .error {color:red;}
+    #divInfo .info  {color:black;}
+    #divInfo .debug {color:blue;}
+    #divBtn input {margin-top:5px; padding:3px 8px; border-radius: 5px; border:solid 1px gray;}
+    #divRule p {text-align:center; margin:0; margin-bottom:-3px;}
+    #divRule div {height:5px; border:solid 1px black; border-bottom:solid 3px black; border-top:0;}
+    #divSelect select {padding:2px 5px;}
+    .myButton {
+        -moz-box-shadow: 0px 6px 14px -7px #276873;
+        -webkit-box-shadow: 0px 6px 14px -7px #276873;
+        box-shadow: 0px 6px 14px -7px #276873;
+        background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #599bb3), color-stop(1, #408c99));
+        background:-moz-linear-gradient(top, #599bb3 5%, #408c99 100%);
+        background:-webkit-linear-gradient(top, #599bb3 5%, #408c99 100%);
+        background:-o-linear-gradient(top, #599bb3 5%, #408c99 100%);
+        background:-ms-linear-gradient(top, #599bb3 5%, #408c99 100%);
+        background:linear-gradient(to bottom, #599bb3 5%, #408c99 100%);
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#599bb3', endColorstr='#408c99',GradientType=0);
+        background-color:#599bb3;
+        -moz-border-radius:8px;
+        -webkit-border-radius:8px;
+        border-radius:8px;
+        display:inline-block;
+        cursor:pointer;
+        color:#ffffff;
+        font-family:Arial;
+        font-size:14px;
+        font-weight:bold;
+        padding:7px 16px;
+        text-decoration:none;
+        text-shadow:0px 1px 0px #3d768a;
+    }
+    .myButton:hover {
+        background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #408c99), color-stop(1, #599bb3));
+        background:-moz-linear-gradient(top, #408c99 5%, #599bb3 100%);
+        background:-webkit-linear-gradient(top, #408c99 5%, #599bb3 100%);
+        background:-o-linear-gradient(top, #408c99 5%, #599bb3 100%);
+        background:-ms-linear-gradient(top, #408c99 5%, #599bb3 100%);
+        background:linear-gradient(to bottom, #408c99 5%, #599bb3 100%);
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#408c99', endColorstr='#599bb3',GradientType=0);
+        background-color:#408c99;
+    }
+    .myButton:active {
+        position: relative;top: 1px;
+    }
+
+    #divCurCar{
+         font-size:24px; border:solid 1px #ddd; padding:5px;
+         border-radius: 5px;
+         background-color: rgba(255,255,255, 0.8);
+         line-height:1.3;
+    }
+    .car{pointer-events:none;}
+
+    /*手机样式*/
+    @media screen and (max-device-width: 800px) {
+        #divCurCar{
+            font-size:14px; border:solid 1px #ddd; padding:5px;
+            border-radius: 5px;
+            background-color: rgba(255,255,255, 0.8);
+            line-height:1.2;
+        
+        }
+    }
+#loading{background-color: #f5f5f5;height: 100%;width: 100%;}
+#loading-center{width: 100%;height: 100%;position: relative;}
+#loading-center-absolute {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 150px;
+    width: 150px;
+    margin-top: -75px;
+    margin-left: -75px;
+    -moz-border-radius: 50% 50% 50% 50%;
+    -webkit-border-radius: 50% 50% 50% 50%;
+    border-radius: 50% 50% 50% 50%;
+
+}
+.object{
+    width: 15px;
+    height: 15px;
+    background-color: #000;
+    position: absolute;
+    -moz-border-radius: 50% 50% 50% 50%;
+    -webkit-border-radius: 50% 50% 50% 50%;
+    border-radius: 50% 50% 50% 50%;
+    -webkit-animation: animate 0.8s infinite;
+    animation: animate 0.8s infinite;
+    }
+#object_one {top: 19px; left: 0px; }
+#object_two {top: 19px;left: 30px; -webkit-animation-delay: 0.1s;  animation-delay: 0.1s;}
+#object_three {top: 19px;left: 60px;    -webkit-animation-delay: 0.3s; animation-delay: 0.3s; }
+#object_four {top: 19px;left: 90px; -webkit-animation-delay: 0.5s; animation-delay: 0.5s; }
+#object_five {top: 19px;left: 120px; -webkit-animation-delay: 0.7s; animation-delay: 0.7s; }
+#object_six {top: 19px;left: 150px;-webkit-animation-delay: 0.9s; animation-delay: 0.9s; }
+
+@-webkit-keyframes animate {
+ 
+  25% {
+    -ms-transform: scale(1.5); 
+    -webkit-transform: scale(1.5);   
+    transform: scale(1.5);  
+      }
+
+
+  75% {
+    -ms-transform: scale(0); 
+    -webkit-transform: scale(0);  
+    transform: scale(0);  
+      }
+}
+@keyframes animate {
+  50% {
+    -ms-transform: scale(1.5,1.5); 
+    -webkit-transform: scale(1.5,1.5); 
+    transform: scale(1.5,1.5); 
+      }
+ 
+  100% {
+    -ms-transform: scale(1,1); 
+    -webkit-transform: scale(1,1); 
+    transform: scale(1,1); 
+      }
+  
+}
+
+.object_content{
+    background: #fff;
+    position:absolute;
+    z-index:1;
+    width: 300px;
+    filter:alpha(opacity=80);   
+    -moz-opacity:0.8;   
+    -khtml-opacity: 0.8;   
+    opacity: 0.8;   
+}
+
+.shadow {
+    box-shadow: 0px 1px 4px rgba(0,0,0,0.3),
+                0px 0px 20px rgba(0,0,0,0.1) inset;
+}
+
+.object_content span {
+    margin-left: 60px;
+    font-size: 20px;
+}
+
+.object_mone {
+    height: 100%; 
+    z-index:-1;  
+    display: none;
+} 
+    </style>
+</head>
+<body style="">
+ <!-- 等待动画 -->
+<div id="loading">
+    <div id="loading-center">
+        <div id="loading-center-absolute">
+            <div class="object" id="object_one"></div>
+            <div class="object" id="object_two"></div>
+            <div class="object" id="object_three"></div>
+            <div class="object" id="object_four"></div>
+            <div class="object" id="object_five"></div>
+            <div class="object" id="object_six"></div>
+        </div>
+    </div>
+</div>    
+<div id="divAlert" style="display:none; text-align:center; z-index:100; position: fixed; bottom:10px; left:5px; right:5px; font-size:12px; color:red; border:solid 1px #fbb; background-color:rgba(255,210,210,0.9);">
+</div>
+
+<canvas id="canvasCalc" class="canvas" style="display:none;">
+你的浏览器不支持 CANVAS
+</canvas>
+<canvas id="canvasMain" class="canvas">
+你的浏览器不支持 CANVAS
+</canvas>
+<canvas id="canvastext" class="canvas" style="z-index: 80000;">
+你的浏览器不支持 CANVAS
+</canvas>
+<canvas id="canvasCar" class="canvas" style="z-index: 90000;">
+你的浏览器不支持 CANVAS
+</canvas>
+
+<div id="divInfo" class="tool" style="top:10px; left:10px;">
+.
+</div>
+
+<div id="divTopInfo" class="tool" style="top:13px; right:120px;">
+    <span id="spanDeviceSocket"></span>
+    <span id="spanAppSocket"></span> &nbsp;
+    <span id="spanNow"></span>
+</div>
+
+<div id="divRule" class="tool" style="bottom:30px; left:10px;">
+
+<p></p><div></div>
+</div>
+
+<div id="divGps" class="tool" style="bottom:10px; left:10px; font-size:9px;">
+</div>
+
+<div id="divSelect" class="tool" style="top:10px; right:10px; display:none;">
+<select id="selShowType">
+</select>
+</div>
+<!-- 隐藏域 -->
+<!-- 夯点间距  -->
+<input type="hidden" id="tamp_points_spac" value="1"> 
+<!-- 排列类型   正方形：1   等边三角形：2-->
+<input type="hidden" id="tamp_points_arrangement" value="1"> 
+<img id="imgCarRoller" class="tool" style="display:none;" />
+<input type="hidden" value="/index.php/Index/Index/gps_canhaodian" id="marker_url">
+<script type="text/javascript" src="./js/GpsPoint.js"></script>
+<script src="./js/jquery.min.js"></script>
+<script src="./js/qhhammer.min.js"></script>
+<script src="./js/qhdraw.js"></script>
+<script>
+var get_data_url = '?um=qh&ua=getdata';
+// var is_debug = true;
+// 调用放大 draw.zoomBo(true) 缩小 draw.zoomBo(false)
+var typeList = {
+    qhj_bian   : {type:'bian_qhj', name:'强夯遍数', min:10, max:30, limit:'过压,合格,欠压,遍'}
+};
+
+
+var guide = 0;
+// 定义变量
+var DS = {
+    isAdd:false,
+    lastId:0,
+    sid:'',
+    cirleList:[],
+    gps_list:[],
+    guide_list:[],
+    serverData:null,
+    getData:function(){
+        // console.log('draw.isBusy: ' + draw.isBusy);
+        if (draw.isBusy) return;
+        draw.isBusy = true;
+        draw.showInfo('.');
+        
+        var data = {
+            limit:draw.rect.join(','),
+            sid:DS.sid,
+            last_id:DS.lastId,
+        };
+        $.post(get_data_url,data,function(data,status){
+            console.log('get_data return');
+            if(status=='timeout'){//超时,status还有success,error等值的情况
+     　　　　　 ajaxTimeoutTest.abort();
+    　　　　　  draw.showInfo("获取数据超时", 'red');
+                setTimeout(status_do,5000);
+    　　　　}else if (status=='error') {
+                 draw.showInfo("获取数据失败！", 'red');
+                 setTimeout(status_do,5000);
+            }else if (status=='success') {
+                get_data_success(data);
+            }
+        });
+    },
+};
+
+// 请求成功后执行方法
+function get_data_success(res)
+{
+    console.log('get_data_success');
+    if (res.result == 0)
+    {
+        // alert(res.error);
+        // return;
+    }
+    var data = res.data;
+    // console.log(data);
+   
+   if (!jQuery.isEmptyObject(data)) 
+    {   
+        if (js_data_key("gnss",data)) 
+        {
+            if (js_data_key("plon",data.gnss)&&js_data_key("plat",data.gnss)&&js_data_key("lon",data.gnss)&&js_data_key("lat",data.gnss)&&js_data_key("points_spac",data.config)&&js_data_key("points_arrangement",data.config)&&js_data_key("radius",data.config)) 
+            {
+                if (js_data_validation(data.gnss.plon)&&js_data_validation(data.gnss.plat)&&js_data_validation(data.gnss.lon)&&js_data_validation(data.gnss.lat)&&js_data_validation(data.gnss.workAngle)) {
+
+                    // 中心内容
+                    if (data.gnss)
+                    {
+                        var lon = parseFloat(data.gnss.plon);
+                        var lat = parseFloat(data.gnss.plat);
+                        var xy = [lon, lat];
+                        
+                        draw.mapRatio = draw.getMapRatio(xy[1]);
+                        draw.center = xy;
+
+                        var mapSize = draw.pixel2map(draw.w, draw.h);
+                        draw.rect = [draw.center[0] - mapSize[0] / 2, draw.center[1] - mapSize[1] / 2, draw.center[0] + mapSize[0] / 2, draw.center[1] + mapSize[1] / 2];
+
+                        draw.showGps('GPS:' + draw.center.join(','));
+                        // 画出中心点
+                        center = {"lon":lon,"lat":lat}
+                        draw.drawCircleList = [center];
+                        
+                        // 绘制强夯机
+                        draw.canvas_Car(data.gnss);
+                    }
+
+                    // 真实夯击点数据处理和显示
+                    if (data.final_list.length > 0)
+                    { 
+                        DS.cirleList = [];
+                        // var jw  = Math.floor(draw.getMapRatio(lat)*draw.zoom);
+                        for (var i = 0; i < data.final_list.length; i++) {
+                            if (data.final_list[i].radius != data.gnss.radius) 
+                            {
+                                data.final_list[i].radius = data.gnss.radius;
+                            }
+                            
+                            DS.cirleList.push(data.final_list[i]);
+                        }
+                    }
+                   
+                   // 排点
+                    reference_create_point(data);
+                    // 车辆移动一定距离后，引导点生成
+                    if (DS.guide_list.length>0) {
+                        create_guide_points(parseFloat(data.gnss.plon), parseFloat(data.gnss.plat));    
+                    }
+                    // 画出引导点
+                    draw.drawCircleList = DS.gps_list;
+
+                    var device_name     = data.config.device_name;
+                    var last_chenjiang  = data.last_chenjiang;
+                    var sum_chenjiang   = data.sum_chenjiang;
+                    //夯击次数
+                    if(data.final_list) {
+                        hit_count = data.final_list[data.final_list.length-1].hit_count;
+                    }else{
+                        hit_count = 0;
+                    }
+                     //夯锤提升高度
+                    if(data.high){
+                        hammer_high = data.high;
+                    }else{
+                        hammer_high = 0;
+                    }
+                    $('#device_name', window.parent.document).html(device_name);
+                    $('#sum_sink', window.parent.document).html(sum_chenjiang);
+                    $('#last_sink', window.parent.document).html(last_chenjiang);
+                    $('#hit_count', window.parent.document).html(hit_count);
+                    $('#hammer_high', window.parent.document).html(hammer_high);
+
+                    // 获取与捶的gps最近的引导点
+                    yd = get_gnss_antenna(data.gnss,data.config.points_spac);
+                    if(yd != false)
+                    {
+                        parent.draw_point(300, 60, data.gnss.workAngle ,parseFloat(data.gnss.lon),parseFloat(data.gnss.lat), yd.lon, yd.lat, true);
+                    }else{
+                        parent.draw_point(300, 60, data.gnss.workAngle ,parseFloat(data.gnss.lon),parseFloat(data.gnss.lat), null, null, false);
+                    }
+
+                    // 删除真实点与引导点相近的引导点
+                    for (var i = 0; i < DS.cirleList.length-1; i++) {
+                         // 删除真实点与引导点相近的引导点
+                        del_reference_point(DS.cirleList[i].lon,DS.cirleList[i].lat,data.config.points_spac);
+                    }
+
+                    // 车辆类型转换
+                    if (data.config.car_type!=1) {
+                        $('#imgdaishiQianghang', window.parent.document).show();
+                        $('#imgQianghang', window.parent.document).hide();
+                    }else{
+                        $('#imgdaishiQianghang', window.parent.document).hide();
+                        $('#imgQianghang', window.parent.document).show();
+                    }
+
+                    // 捶动画函数
+                    parent.hammer_high();
+                    draw.isBusy = false;
+                }else{
+                    draw.showInfo("暂无与数据！", 'red');
+                    console.log('获取车辆天线车中心GPS有为空值！');
+                    setTimeout(status_do,5000);
+                }
+
+            }else{  
+                draw.showInfo("暂无与数据！", 'red');
+                console.log('获取车辆天线车中心GPS失败！');
+                setTimeout(status_do,5000);
+            }
+        }else{
+            draw.showInfo("暂无与数据！", 'red');
+            console.log('无法获取到车辆和夯点相关数据');
+            setTimeout(status_do,5000);
+        }
+    }else{
+        draw.showInfo("暂无与数据！", 'red');
+        console.log("无法获取到服务器端返回相关数据");
+        setTimeout(status_do,5000);
+    }
+    draw.reDraw();
+    draw.showInfo('');    
+}
+
+// 获取夯击方式 1满夯 2点夯 3置换  获取配置参数
+function get_hammer_type(){
+    var url = "?um=qh&ua=get_hammer_type";
+    return getguidedata(url,"夯击方式失败！");
+}
+
+// 请求方法
+function getguidedata(url,text) {  
+    var getdata;
+    $.ajax({  
+        type: "POST",  
+        cache: false,  
+        data: "type=1",  
+        async: false,  
+        url: url,  
+        success: function(res) {  
+            getdata = res;  
+        }, error: function(data) {  
+            console.log('getguidedata faild: ' + text);  
+        }  
+    });  
+    return getdata;  
+}  
+
+// 是否建引导排点
+function reference_create_point(data){
+    //1满夯 2点夯 3置换
+    var config = get_hammer_type();  //获取排点配置参数
+    if (config.result != false) 
+    { 
+        if (config.QHconf.radius != data.gnss.radius) 
+        {
+            var radius = data.gnss.radius;
+        }else{
+            var radius = config.QHconf.radius;
+        }
+        if (config.QHconf.hammer_type==3) return false;
+        if (config.QHconf.hammer_type==2||config.QHconf.hammer_type==1) 
+        {
+            // 2点夯 1强夯置换
+            if (js_data_validation(config.QHconf.lon)&&js_data_validation(config.QHconf.lat)) 
+            {
+                // 有历史排点信息记录
+                if (config.QHconf.guide_status!=1) 
+                {
+                    // 重新排点
+                    // 当前车辆中心与历史排点基准点距离是否超出150米范围
+                    var center_history = center_history_len(data.gnss.plon,data.gnss.plat,config.lon,config.lat,config.QHconf.points_spac,18);
+                    if (center_history) 
+                    {
+                       // 寻找最近引导点
+                        if (!confirm('车已离开引导夯点范围，您确定要重新布点吗？')) 
+                        {
+                            return false;
+                        }else{
+                            guide_len_data();
+                            window.location.reload();
+                        }
+                    }else{
+                        
+                        // 根据历史排点直接排点
+                        if (config.QHconf.guide_again!=1) 
+                        { 
+                            // 按照以前排点排
+                            var points = {
+                                "slon":config.QHconf.lon,
+                                "slat":config.QHconf.lat,
+                                "pAngle":config.QHconf.pAngle,
+                                "points_spac":config.QHconf.points_spac,
+                                "points_arrangement":config.QHconf.points_arrangement,
+                                "radius":radius,
+                            };
+                            create_points_data_fun(points,0);
+                        }else{
+                            // 重新打点排
+                            var glen = config.QHconf.guide_length;
+                            if (!js_data_validation(glen)) var glen = 0;
+                            if (DS.cirleList.length>=parseFloat(glen)+2) 
+                            {
+                                // 获取方向点
+                                startp = start_points(DS.cirleList[glen].lon,DS.cirleList[glen].lat,config.QHconf.points_spac,glen);
+                                if (startp != false) 
+                                { 
+                                    var points = {
+                                        "slon":parseFloat(DS.cirleList[glen].lon),
+                                        "slat":parseFloat(DS.cirleList[glen].lat),
+                                        "elon":parseFloat(startp.lon),
+                                        "elat":parseFloat(startp.lat),
+                                        "points_spac":config.QHconf.points_spac,
+                                        "points_arrangement":config.QHconf.points_arrangement,
+                                        "radius":radius,
+                                    }
+                                    create_points_data_fun(points,true);
+                                    add_pAngle(1,0,0);
+                                }
+                            } 
+                        }
+                       
+                    }
+                }else{
+                    var points = {
+                        "slon":config.QHconf.lon,
+                        "slat":config.QHconf.lat,
+                        "pAngle":config.QHconf.pAngle,
+                        "points_spac":config.QHconf.points_spac,
+                        "points_arrangement":config.QHconf.points_arrangement,
+                        "radius":radius,
+
+                    };
+                    create_points_data_fun(points,0);
+                }
+            }else{
+                // 夯击两点，在第三点出现时进行排布
+                // 重新打点排
+                if (DS.cirleList.length>=2) 
+                {
+                    var points = {
+                        "slon":DS.cirleList[0].lon,
+                        "slat":DS.cirleList[0].lat,
+                        "elon":parseFloat(DS.cirleList[1].lon),
+                        "elat":parseFloat(DS.cirleList[1].lat),
+                        "points_spac":config.QHconf.points_spac,
+                        "points_arrangement":config.QHconf.points_arrangement,
+                        "radius":radius,
+                    }
+                    create_points_data_fun(points,true);
+                    add_pAngle(1,0,0);
+                }
+            }
+       }
+    }
+}
+
+// 判断两点之间距离是否超出夯点间距的一定倍数距离
+function center_history_len(plon,plat,hlon,hlat,points_spac,multiple){
+    var hlons = parseFloat(hlon);
+    var hlats = parseFloat(hlat);
+    var plons = parseFloat(plon);
+    var plats = parseFloat(plat);
+    var xy = draw.map2pixel(plons, plats);
+    var gxy = draw.map2pixel(hlons, hlats);
+    var m = draw.getDis(xy[0],xy[1],gxy[0],gxy[1])/draw.zoom;
+    if (Math.floor(m)>=parseFloat(points_spac)*parseFloat(multiple)) {
+        return true;
+    }else{
+        return false;
+    } 
+}
+
+
+// 通过两点坐标和相关信息排点
+// slon,slat,elon,elat,pAngle,points_spac,points_arrangement,radius 所需参数
+function create_points_data_fun(data,type){
+    DS.guide_list = [];
+    if (type) {
+        // 起始坐标
+        var sPoints = new GpsPoint(parseFloat(data.slon),parseFloat(data.slat));
+        // 结束坐标    
+        var ePoints = new GpsPoint(parseFloat(data.elon),parseFloat(data.elat));
+        // 确认排布方向    
+        var pAngle  = sPoints.getNorthAngle(ePoints);    // 现场引导点的排列方向
+        // 创建引导点坐标
+        create_reference_point(parseFloat(data.slon),parseFloat(data.slat),pAngle,data.radius,data.points_spac,data.points_arrangement);
+
+        // 保存排点信息
+        var gnss_points = {"lon":parseFloat(data.slon),"lat":parseFloat(data.slat),"pAngle":pAngle,"radius":parseFloat(data.radius),"points_spac":parseFloat(data.points_spac),"points_arrangement":parseFloat(data.points_arrangement)};
+        DS.guide_list.push(gnss_points);
+        
+    }else{
+        // 创建引导点坐标
+        create_reference_point(parseFloat(data.slon),parseFloat(data.slat),data.pAngle,data.radius,data.points_spac,data.points_arrangement);
+
+        // 创建引导点坐标
+        var gnss_points = {"lon":parseFloat(data.slon),"lat":parseFloat(data.slat),"pAngle":data.pAngle,"radius":parseFloat(data.radius),"points_spac":parseFloat(data.points_spac),"points_arrangement":parseFloat(data.points_arrangement)};
+        DS.guide_list.push(gnss_points);
+        
+    } 
+  
+}
+ 
+
+// 寻找排点的方向起始点
+function start_points(lon,lat,points_spac,glen){
+    var startp = false; 
+    for (var i = 1; i < DS.cirleList.length; i++) {
+        if (i>glen) {
+            var clon = parseFloat(DS.cirleList[i].lon);
+            var clat = parseFloat(DS.cirleList[i].lat);
+            var xy = draw.map2pixel(lon, lat);
+            var gxy = draw.map2pixel(clon, clat);
+            var m = draw.getDis(xy[0],xy[1],gxy[0],gxy[1])/draw.zoom;
+            if (m > points_spac/2 && m < points_spac*1.5) {
+                return DS.cirleList[i];
+            } 
+        }
+    }
+    return startp
+}
+
+
+// 定时任务工作状态
+function status_do(){
+    draw.isBusy=false;
+}
+// 定义夯击点的颜色
+var draw_color = [
+    [255, 0, 0],   // '#FF9900',
+    [0, 255, 0], // '#FFA366',
+];
+
+// 定时任务
+DS.sid = '';
+var draw = new Draw();
+var autoLoad = false;
+$(function(){
+    draw.drawColorList = draw_color;
+    draw.initWeb([104, 30], typeList, 'qhj_bian');
+    window.setInterval(function(){
+        autoLoad = true;
+        DS.getData();
+    }, 1000);
+});
+
+// 车辆移动一定距离后，引导点生成
+function create_guide_points(lon, lat){
+        var guide_lon = parseFloat(DS.guide_list[0].lon);
+        var guide_lat = parseFloat(DS.guide_list[0].lat);
+        var pAngle = parseFloat(DS.guide_list[0].pAngle);
+        var radius = parseFloat(DS.guide_list[0].radius);
+        var points_spac = parseFloat(DS.guide_list[0].points_spac);
+        var points_arrangement = parseFloat(DS.guide_list[0].points_arrangement);
+        var center = draw.map2pixel(parseFloat(lon), parseFloat(lat));
+        var guide_xy = draw.map2pixel(guide_lon, guide_lat);
+        var m = draw.getDis(center[0],center[1],guide_xy[0],guide_xy[1])/draw.zoom;
+        if (Math.floor(m)>=DS.guide_list[0].points_spac*3) 
+        {
+            // 获取最近引导点
+            re_points = recently_points(lon, lat, 0 , points_spac*1.5*draw.zoom);
+            if(re_points != null)
+            {
+                DS.guide_list = [];
+                var gnss_points = {"lon":re_points.lon,"lat":re_points.lat,"pAngle":pAngle,"radius":radius,"points_spac":points_spac,"points_arrangement":points_arrangement};
+                DS.guide_list.push(gnss_points);
+                create_reference_point(re_points.lon,re_points.lat,pAngle,radius,points_spac,points_arrangement);
+                add_pAngle(1,0,0);
+            }
+        } 
+    }
+
+
+
+// 获取最近引导点
+function recently_points(lon,lat,min,max){
+    for (var i = 0; i <  DS.gps_list.length-1; i++) {
+        var guide_lon = parseFloat(DS.gps_list[i].lon);
+        var guide_lat = parseFloat(DS.gps_list[i].lat);
+        var carxy =  draw.map2pixel(lon, lat);
+        var guidexy = draw.map2pixel(guide_lon, guide_lat);
+        var d =draw.getDis(carxy[0],carxy[1],guidexy[0],guidexy[1]);
+        if (d > min && d < max) {
+            return {"lon":guide_lon ,"lat": guide_lat};
+        }
+    }
+    return null;
+}
+
+
+// 创建引导点
+ //points_spac;//夯点间距
+// p(slon,slat); //开始点
+// p(elon,elat)//结束点
+// radius; //捶的半径
+// points_arrangement; //排列形状
+function create_reference_point(slon,slat,pAngle,radius,points_spac,points_arrangement){
+
+    var pAngles = parseFloat(pAngle)-180;
+   
+    console.log("pAngles: " + pAngles);
+    if(pAngle < 0) pAngle += 360;
+    if(pAngle > 360) pAngle -= 360;
+    if(pAngles < 0) pAngles += 360;
+    if(pAngles > 360) pAngles -= 360;
+    // 沿着pAngle方向延伸，以hammer_width的宽度创建一组坐标
+    
+    DS.gps_list = [];
+    // 正三角形
+    create_point(slon,slat,pAngles,points_spac,radius,points_arrangement);
+    create_point(slon,slat,pAngle,points_spac,radius,points_arrangement);
+    if (points_arrangement==2) {
+        create_quanchang_points(slon,slat,pAngle-60,points_spac,radius);
+        create_quanchang_points(slon,slat,parseFloat(pAngle)+120,points_spac,radius);
+    }else if (points_arrangement==1) {
+        create_quanchang_points(slon,slat,pAngle-90,points_spac,radius);
+        create_quanchang_points(slon,slat,parseFloat(pAngle)+90,points_spac,radius);
+    }else if (points_arrangement==3) {
+        
+    }
+    var gps_arr = {"lon":slon,"lat":slat,"radius":radius};
+    DS.gps_list.push(gps_arr);
+    
+}
+
+// 创建坐标
+function create_point(slon,slat,r,w,radius,points_arrangement){
+
+    var fPoints = new GpsPoint(parseFloat(slon),parseFloat(slat));
+    for (var i = 0; i < 20; i++) {
+        var returnNewObj = fPoints.move(w,r);
+        var gps_arr = {'lon':returnNewObj.lon,'lat':returnNewObj.lat,'radius':radius};
+        DS.gps_list.push(gps_arr);
+        if (points_arrangement==1) {
+            create_quanchang_points(returnNewObj.lon,returnNewObj.lat,r-90,w,radius);
+            create_quanchang_points(returnNewObj.lon,returnNewObj.lat,parseFloat(r)+90,w,radius);
+        }else if (points_arrangement==2) {
+             create_quanchang_points(returnNewObj.lon,returnNewObj.lat,parseFloat(r)-60,w,radius);
+            create_quanchang_points(returnNewObj.lon,returnNewObj.lat,parseFloat(r)+parseFloat(120),w,radius);
+        }
+        
+       
+    }
+}
+
+// 全场
+function create_quanchang_points(slon,slat,r,w,radius){
+    var fPoints = new GpsPoint(parseFloat(slon),parseFloat(slat));
+    for (var i = 0; i < 20; i++) {
+        var returnNewObj = fPoints.move(w,r);
+        var gps_arr = {'lon':returnNewObj.lon,'lat':returnNewObj.lat,'radius':radius};
+        DS.gps_list.push(gps_arr);
+        
+    } 
+}
+
+
+
+// 清除重复的参考点
+function del_reference_point(rlon,rlat,points_spac)
+{
+    var jw   = draw.getMapRatio(rlat);
+    var args = DS.gps_list;
+    for (var i = 0; i < args.length-1; i++) {
+        var gps   = args[i];
+        var lon   = parseFloat(gps.lon);
+        var lat   = parseFloat(gps.lat);
+        var xy    =  draw.map2pixel(lon, lat);
+        var xy1   = draw.map2pixel(parseFloat(rlon), parseFloat(rlat));
+        var w     = draw.getDis(xy[0],xy[1],xy1[0],xy1[1]);
+        var w_min = draw.zoom*points_spac/2;
+        if (w < w_min) {
+            args.splice(i,1);
+        }
+    }
+}
+
+//获取GNSS天线1与最近的参考点，让其变为红色
+function get_gnss_antenna(gnss_gps,points_spac){
+       
+    var yd_point = false; 
+    var jw       = draw.getMapRatio(gnss_gps.lat);
+    var args     = DS.gps_list;
+    // //console.log("length:"+args.length);        
+    var xy1      = draw.map2pixel(gnss_gps.lon, gnss_gps.lat);//夯击点转换后的像素坐标
+    var w_min    = (draw.zoom*points_spac/2+jw);
+    // 获取与天线1最近的引导点，并且变红色
+    for (var i = 0; i < args.length-1; i++) {
+
+        var gps_str = args[i];
+        var lon     = parseFloat(gps_str.lon);
+        var lat     = parseFloat(gps_str.lat);
+        var radius  = parseFloat(gps_str.radius);
+        var xy      = draw.map2pixel(lon, lat);
+        var w       = draw.getDis(xy[0],xy[1],xy1[0],xy1[1]);
+
+        //2:当前锤中心到最近的引导点的中心的距离阀值
+        if (w < w_min) {
+            args[i] = {'lon':lon,'lat':lat,"radius":radius,"type":1};
+            yd_point = args[i];
+        }else{
+            args[i] = {'lon':lon,'lat':lat,'radius':radius,"type":2};            
+        }        
+    }
+    return yd_point;
+
+}
+
+
+// 验证传参数合法性
+function js_data_validation(key){
+    if (key == null||key == undefined||isNaN(key)){
+        return false;
+    }else{
+        return true;
+    } 
+}
+
+// 验证传参数是否存在此键值
+function js_data_key(key,obj){
+    if(obj == null) return false;
+    if (!(key in obj)) {
+        console.log(key+"键值不存在！");
+        return false;
+    }else{
+        return true;
+    }
+}
+
+// 保存历史排点信息
+function add_pAngle(status,len,again){
+    if (DS.guide_list.length>0) {
+         data = {
+            "lon" : DS.guide_list[0].lon,
+            "lat" : DS.guide_list[0].lat,
+            "radius" : DS.guide_list[0].radius,
+            "pAngle" : DS.guide_list[0].pAngle,
+            "points_spac" : DS.guide_list[0].points_spac,
+            "points_arrangement" : DS.guide_list[0].points_arrangement,
+            "guide_status":status,//判断是否要重新打点排点。
+            "guide_length":len,
+            "guide_again":again,
+        }
+    }else{
+        data = {
+            "guide_status":status,//判断是否要重新打点排点。
+            "guide_length":len,
+            "guide_again":again,
+        }
+    }
+
+    var url = "?um=qh&ua=hammer_pAngle_type";
+    $.post(url,data,function(res){
+        if (res.result!=1) console.log("保存历史排点信息失败！");
+    });
+}
+
+// 重新排点
+function guide_len_data(){
+    var len = DS.cirleList.length;
+    console.log("guide_len_data: " + len);
+    add_pAngle(0,len,1);
+}
+</script>
+
+</body>
+</html>

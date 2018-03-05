@@ -1,0 +1,356 @@
+<ul id="myTab" class="nav nav-tabs">
+    <li class="active">
+        <a href="#dialup" data-toggle="tab">拨号</a>
+    </li>
+    <li>
+        <a href="#lan0" data-toggle="tab">LAN(eth0)</a>
+    </li>
+    <li>
+        <a href="#lan1" data-toggle="tab">LAN(eth1)</a>
+    </li>
+    <li>
+        <a href="#wifi" data-toggle="tab">WIFI</a>
+    </li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade in active" id="dialup">
+        <form class="form-horizontal">
+        <fieldset>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">网络信号/数据状态: </label>
+                <div class="controls" >
+                    <img src="public/img/signal0.png" class="networkimg" id="network" />
+                    <img src="public/img/updata0.png" class="networkimg" id="updata" />
+                    <img src="public/img/down0.png" class="networkimg" id="down" />
+                    <span class="label label-info" id="snd_bytes"></span>
+                    <span class="label label-success" id="rcv_bytes"></span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">拨号状态: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xxlarge" id="stage" style="font-size: 8px;"></span>
+                </div>
+            </div>
+             <div class="control-group">
+                <label for="customer_name" class="control-label">MAC地址: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="mac"></span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">IP地址: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="ip"></span>
+                </div>
+            </div>
+             <div class="control-group">
+                <label for="customer_name" class="control-label">广播地址: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="bcast"></span>
+                </div>
+            </div>
+             <div class="control-group">
+                <label for="customer_name" class="control-label">子网掩码: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="mask"></span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+        <legend style="font-size: 14px;line-height: 30px;">网络</legend>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">RSSI: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="rssi"></span>
+                    <span class="help-inline">99表示未知</span>
+                </div>
+            </div>
+             <div class="control-group">
+                <label for="customer_name" class="control-label">CSQ: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="dbm"></span>
+                    <span class="help-inline">dBm</span>
+                </div>
+            </div>
+             <div class="control-group">
+                <label for="customer_name" class="control-label">误码率: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="bit_error_rate"></span>
+                    <span class="help-inline">99表示未知</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">网络区域编号: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="net_area"></span>
+                    <span class="help-inline">网络区域编号</span>
+                </div>
+            </div>
+           
+             <div class="control-group">
+                <label for="customer_name" class="control-label">注册状态: </label>
+                <div class="controls">
+                    <select class="span4"  disabled="disabled">
+                      <option value="0" id="reg0">未找到运营商网络</option>
+                      <option value="1" id="reg1">已成功注册到网络</option>
+                      <option value="2" id="reg2">已连接但未注册到网络</option>
+                      <option value="3" id="reg3">注册被拒绝</option>
+                      <option value="4" id="reg4">未知的数据</option>
+                      <option value="5" id="reg5">注册在漫游状态</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">网络名称: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="net_name"></span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+        <legend style="font-size: 14px;line-height: 30px;">设备</legend>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">设备名称: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="device_name"></span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">IMEI: </label>
+                <div class="controls">
+                    <span class="uneditable-input input-xlarge" id="imei"></span>
+                </div>
+            </div>
+        </fieldset>
+        </form>
+    </div>
+    <div class="tab-pane fade" id="lan0">
+        <form class="form-horizontal">
+        <fieldset>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">IP地址: </label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="lanip0"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">子网掩码: </label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="lanmask0"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">网关: </label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="langate0"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <input class="btn btn-success lanSave" type="button" data-id="0" value="提交保存">
+                </div>
+            </div>
+        </fieldset>
+        </form>
+    </div>
+    <div class="tab-pane fade" id="lan1">
+        <form class="form-horizontal">
+        <fieldset>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">IP地址: </label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="lanip1"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">子网掩码: </label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="lanmask1"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">网关: </label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="langate1"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <input class="btn btn-success lanSave" type="button" data-id="1" value="提交保存">
+                </div>
+            </div>
+        </fieldset>
+        </form>
+    </div>
+    <div class="tab-pane fade" id="wifi">
+        <form class="form-horizontal">
+        <fieldset>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">SSID: </label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="ssid"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="customer_name" class="control-label">密码: </label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="password"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <input class="btn btn-success" type="button" id="wifiSave" value="提交保存">
+                </div>
+            </div>
+        </fieldset>
+        </form>
+    </div>
+
+</div>
+<script type="text/javascript" src='./public/js/ServiceApi.js'></script>
+<script type="text/javascript">
+var $last_rxb = 0;
+var $last_txb = 0;
+var $last_rcv_time;
+var $rxb_timout_handle = 0;
+var $txb_timout_handle = 0;
+var timer;
+$(function(){    
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var activeTab = $(e.target).text();
+        if(activeTab == 'LAN(eth0)'){
+            clearTimeout(timer); 
+            ServiceApi.request("LanIp.get_ip", {index:0}, function(seq, result, info, val){
+                if(result === true)
+                {
+                    $("#lanip0").val(val.address);
+                    $("#langate0").val(val.gateway);
+                    $("#lanmask0").val(val.netmask);
+                }
+                
+            });
+        }else if(activeTab == 'LAN(eth1)'){
+            clearTimeout(timer); 
+            ServiceApi.request("LanIp.get_ip", {index:1}, function(seq, result, info, val){
+                if(result === true)
+                {
+                    $("#lanip1").val(val.address);
+                    $("#langate1").val(val.gateway);
+                    $("#lanmask1").val(val.netmask);
+                }
+                
+            }); 
+        }else if(activeTab == 'WIFI'){
+            clearTimeout(timer);
+            ServiceApi.request("Wifi.get_ssid", {}, function(seq, result, info, val){
+                if(result === true)
+                {
+                    $("#ssid").val(val)
+                }
+            });
+            ServiceApi.request("Wifi.get_pass", {}, function(seq, result, info, val){
+                if(result === true)
+                {
+                    $("#password").val(val)
+                }
+            });
+        }else{
+            timer = window.setInterval(function(){ServiceApi.request("Cache.get", {"key": "sys:dialup"}, refresh);}, 1000);
+        }
+    });
+    $(".lanSave").click(function(){
+        var ind = $(this).attr("data-id");
+        ServiceApi.request("LanIp.set_ip", {address:$("#lanip"+ind).val(),gateway:$("#langate"+ind).val(),netmask:$("#lanmask"+ind).val(),index:ind}, function(seq, result, info, val){
+            if(result === true)
+            {
+                alert("修改成功");
+            }
+            else
+            {
+                alert("修改失败");
+            } 
+        });
+        alert("修改成功!");
+    });
+    $("#wifiSave").click(function(){
+        ServiceApi.request("Wifi.set_auth", {ssid:$("#ssid").val(),pass:$("#password").val()}, function(seq, result, info, val){
+            if(result === true)
+            {
+                alert("修改成功");
+            }
+            else
+            {
+                alert("修改失败");
+            } 
+        });
+        alert("修改成功!");
+    }); 
+    
+});
+function refresh(seq, result, info, val){
+    if(result === true)
+    {
+        if(val === false || val == null) return false;
+        var obj = $.parseJSON(val);
+        if(!obj.status) obj.status = {};
+        if(!obj.device) obj.device = {};
+        if(!obj.network) obj.network = {};
+
+        if (obj.status.signal_quality) $("#network").attr("src","public/img/signal" + obj.status.signal_quality + ".png");
+
+        if($bj.network.rxb)
+        {
+            var $speed_rxb = $last_rcv_time ? (obj.network.rxb - $last_rxb) * 1000 / (new Date().valueOf() - $last_rcv_time.valueOf()) : 0;
+            $('#rcv_bytes').html('<i class="icon-arrow-down icon-white"></i> Total: ' + bytes2text(obj.network.rxb) + '  Speed: ' + bytes2text($speed_rxb) + '/s');
+
+            $("#down").attr("src", obj.network.txb > $last_txb ? "public/img/down1.png" : "public/img/down0.png");
+
+            $last_rxb = obj.network.rxb;
+        }
+
+        if(obj.network.txb)
+        {
+            var $speed_txb = $last_rcv_time ? (obj.network.txb - $last_txb) * 1000 / (new Date().valueOf() - $last_rcv_time.valueOf()) : 0;
+            $('#snd_bytes').html('<i class="icon-arrow-up icon-white"></i> Total: ' + bytes2text(obj.network.txb) + '  Speed:' + bytes2text($speed_txb) + '/s');
+
+            $("#updata").attr("src", obj.network.txb > $last_txb ? "public/img/updata1.png" : "public/img/updata0.png");
+
+            $last_txb = obj.network.txb;
+        }
+
+        $("#stage").html(obj.stage);
+        if(obj.device.name) $("#device_name").html(obj.device.name);
+        if(obj.device.imei) $("#imei").html(obj.device.imei);
+        if(obj.status.rssi) $("#rssi").html(obj.status.rssi);
+        if(obj.status.dbm) $("#dbm").html(obj.status.dbm);
+        if(obj.status.net_area && obj.status.net_sub_area)
+        {
+            $("#net_area").html(obj.status.net_area.replace(/\"/g,"")+" / "+obj.status.net_sub_area.replace(/\"/g,""));
+        }
+        if(obj.status.net_name) $("#net_name").html(obj.status.net_name);
+        if(obj.status.bit_error_rate) $("#bit_error_rate").html(obj.status.bit_error_rate);
+        if ($obj.status.data_status) {
+            $("#inlineRadio1").attr('checked','checked');
+            $("#error_data").hide();
+        }else{
+            $("#success_data").hide();
+            $("#inlineRadio2").attr('checked','checked');
+        }
+        $("#reg"+obj.status.reg_state).attr('selected','selected');  
+        $("#mac").html(obj.network.mac);
+        $("#ip").html(obj.network.ip);
+        $("#bcast").html(obj.network.bcast);
+        $("#mask").html(obj.network.mask);
+        $last_rcv_time = new Date();
+    }
+}
+
+timer = window.setInterval(function(){ServiceApi.request("Cache.get", {"key": "sys:dialup"}, refresh);}, 1000);
+
+function validKey(key)
+{
+    return key.replace(/[^\w]/g, "__");
+}
+
+</script>

@@ -1,0 +1,158 @@
+<legend><button type="button" class="btn btn-primary" id="bthadd">添加</button></legend>
+<form class="form-horizontal" onsubmit="return false;">
+<table class="table table-bordered table-hover" id="cache_list">
+    <tr>
+        <th>键名</th>
+        <th>值</th>
+    </tr>
+</table>
+</form>
+<script type="text/javascript" src='./public/js/ServiceApi.js'></script>
+<style type="text/css">
+.led{margin-right:5px;}
+</style>
+<script type="text/javascript">
+    ServiceApi.request("Cache.keys", {"prefix": ""}, function(seq, result, info, list){
+        if(result === true)
+        {  
+            for(i in list)
+            {
+                key = list[i];
+                if(key.indexOf('endpoint:') >= 0 || key.indexOf('enh:') >= 0) continue;
+                var valid_key = validKey(key);
+                if($('#cache_' + valid_key).length == 0)
+                {
+                    var line_html = '<tr id="cache_' + valid_key + '">';
+                    line_html += '<td class="key" id="cache_key_' + valid_key + '">' + key + '</td>';
+                    line_html += '<td class="val" id="cache_val_' + valid_key + '" key="' + key + '"></td>';
+                    line_html += '</tr>';
+                    $('#cache_list').append(line_html);
+                    ServiceApi.request("Cache.get", {"key": key}, function(seq, result, info, data){
+                        if(result === true)
+                        {   
+                            valid_key = validKey(info);
+                            if(typeof(data) == 'object')
+                            {
+                                data = JSON.stringify(data);
+                            }
+                            $("#cache_val_"+valid_key).html(data);
+                        }
+                    });
+                }
+
+
+                
+            }
+        }
+    });
+
+function validKey($key)
+{
+    return $key.replace(/[^\w]/g, "__");
+}
+
+// var $socket = null;
+// var host = window.location.host;
+// socketInit("cache", "ws://" + host + ":1160");
+// function socketInit($name, $url)
+// {
+//     $socket = new WebSocket($url);
+
+//     $socket.onopen = function(){
+//         console.log("socket connected");
+//         request("keys", "");
+//     };
+
+//     $socket.onclose = function()
+//     {
+//         console.log("socket closed");
+//         window.setTimeout(function(){
+//             socketInit($name, $url);
+//         }, 2000);
+//     };
+
+//     $socket.onmessage = function($evt){
+//         var $reply = $.parseJSON($evt.data);
+//         var $reply_action = $reply.action;
+//         var $reply_data = $reply.data;
+
+//         if($reply_action == "err")
+//         {
+//             reply_err($reply_data);
+//         }
+//         else if($reply_action == "keys")
+//         {
+//             reply_keys($reply_data);
+//         }
+//         else if($reply_action == "val")
+//         {
+//             reply_val($reply_data);
+//         }
+//     };
+// }
+// // 错误信息提示
+// function reply_err($error_msg)
+// {
+//     $("#error_content").html($error_msg);
+//     $('#error_msg').modal('show');
+//     setTimeout(function(){$("#error_msg").modal("hide")},3000);
+// }
+
+// function reply_val($key_val)
+// {
+//     var $key = $key_val.key;
+//     var $val = $key_val.val;
+
+//     var $valid_key = validKey($key);
+//     if($val === false)
+//     {
+//         $('#cache_' + $valid_key).remove();
+//     }
+//     else
+//     {
+//         $('#cache_' + $valid_key + ' .val').html($val);
+
+//         window.setTimeout(function(){
+//             request("val", {'key': $key});
+//         }, 200);
+//     }
+// }
+
+// function reply_keys($keys)
+// {
+//     $keys = $.parseJSON($keys);
+//     for(var $i = 0; $i < $keys.length; $i++)
+//     {
+//         var $key = $keys[$i];
+//         if($key.startsWith("sys:services:")) continue;
+
+//         var $valid_key = validKey($key);
+
+//         if($('#cache_' + $valid_key).length == 0)
+//         {
+//             var $line_html = '<tr id="cache_' + $valid_key + '">';
+//             $line_html += '<td class="key" id="cache_key_' + $valid_key + '">' + $key + '</td>';
+//             $line_html += '<td class="val" id="cache_val_' + $valid_key + '" key="' + $key + '"></td>';
+//             $line_html += '</tr>';
+//             $('#cache_list').append($line_html);
+//             request("val", {'key':$key});
+//         }
+//     }
+
+//     window.setTimeout(function(){
+//         request("keys", "");
+//     }, 3000);
+// }
+
+// function validKey($key)
+// {
+//     return $key.replace(/[^\w]/g, "__");
+// }
+
+// function request($action, $params)
+// {
+//     var $request = {"action": $action, "params": $params};
+//     $socket.send(JSON.stringify($request));
+// }
+
+</script>

@@ -1,0 +1,428 @@
+<form class="form-horizontal" onsubmit="return false;">
+<fieldset>
+<legend>配置</legend>
+    <div class="control-group">
+        <label for="customer_name" class="control-label">拉线附加长度: </label>
+        <div class="controls input-append" style="display:block;">
+            <input class="input-mini" type="number" min="0" max="20" id="val_lx_ext" name="val_lx_ext" value="10" /><span class="add-on">米</span>
+            <span class="help-inline">
+                <input type="button" id="btn_set_ext_0" class="btn btn-link" value="置为 0 米" /> &nbsp;
+                <input type="button" id="btn_set_ext_10" class="btn btn-link" value="置为 10 米" /> &nbsp;
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="customer_name" class="control-label">平面距离: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+            <input class="input-mini" type="number" step="0.01" min="0" max="20" id="val_hd" name="val_hd" value="10" /><span class="add-on">米</span>
+            <button id="btn_use_hd" class="btn btn-link" style="display:none;"> 根据已知的平面距离， 计算垂直高度差 </button>
+            <br />
+            <span class="label">* 拉线编码器与挂钩位置的平面距离， 此距离一定低于拉线编码器读数</span>
+            </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="customer_name" class="control-label">水平高度差: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+            <input class="input-mini" type="number" step="0.01" min="0" max="20" id="val_vd" name="val_vd" value="0" disabled="true" /><span class="add-on">米</span>
+            <button id="btn_use_vd" class="btn btn-link"> 根据已知的水平高度差， 计算平面距离 </button>
+            <br />
+            <span class="label">* 拉线编码器与挂钩位置的水平高差， 不用考虑锤高与锤所在位置等因素</span>
+            </label>
+        </div>
+    </div>
+</fieldset>
+<fieldset>
+<legend>读数</legend>
+    <div class="control-group">
+        <label for="customer_name" class="control-label"><span class="led" id="led_ec">■</span>滑轮读数: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+            <input type="number" max="10000" readonly="true" id="val_ec" name="val_ec" value="0" /><span class="add-on">圈</span>
+            <span class="help-inline updown"></span>
+            </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="customer_name" class="control-label"><span class="led" id="led_lx">■</span>拉线读数: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+            <input type="number" max="20" readonly="true" id="val_lx" name="val_lx" value="0" /><span class="add-on">米</span>
+            <span class="help-inline updown"></span>
+            </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="customer_name" class="control-label">提升高程: </label>
+        <div class="controls input-append" style="display:block;">
+            <input type="number" max="20" readonly="true" id="val_hi" name="val_hi" value="0" /><span class="add-on">米</span>
+        </div>
+    </div>
+</fieldset>
+<fieldset>
+<legend>操作</legend>
+	<div class="form-actions">
+        <input type="button" id="btn_start" class="btn btn-warning" value="开始记录" /> &nbsp;
+        <input type="button" id="btn_stop" disabled="true" class="btn btn-success" value="完成记录" /> &nbsp;
+        <input type="button" id="btn_submit" disabled="true" class="btn btn-primary" value="提交数据" /> &nbsp;
+        <a href="?um=sys&ua=download&show_name=jiaozhun_config.php&file_path={ $file_path }" class="btn btn-inverse"><i class="icon-arrow-down icon-white"></i>下载文件</a>
+         &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        <input type="button" class="btn" data-toggle="modal" data-target="#modalLog" value="查看日志" /> &nbsp;
+        <input type="button" class="btn" data-toggle="modal" data-target="#modalChart" id="btnShowChart" disabled="true" value="查看校准曲线" />
+        
+    </div>
+</fieldset>
+</form>
+
+<div id="modalChart" class="modal hide fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4>校准曲线</h4>
+    </div>
+    <div class="modal-body">
+        <div id="chartJiaozhun" style="width:508px;height:300px;"></div>
+    </div>
+    <div class="modal-footer">
+        <input type="button" class="btn" data-dismiss="modal" aria-hidden="true" value="关闭" />
+    </div>
+</div>
+
+<div id="modalLog" class="modal hide fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4>数据日志</h4>
+    </div>
+    <div class="modal-body">
+        <textarea id="logJiaozhun" style="width:508px;height:300px;"></textarea>
+    </div>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-primary" id="btnClearLog" value="清除日志" />
+        <input type="button" class="btn" data-dismiss="modal" aria-hidden="true" value="关闭" />
+    </div>
+</div>
+
+<style type="text/css">
+.led{margin-right:5px;}
+</style>
+<script src="./js/ServiceApi.js"></script>
+<script src="./js/jquery.flot.js"></script>
+<script type="text/javascript">
+socketInit("ec", "ws://192.168.0.35:5001");
+socketInit("lx", "ws://192.168.0.30:5000");
+function socketInit($name, $url)
+{
+    var socket = new WebSocket($url);
+    led_show($name, "#ff0", "connecting");
+
+    socket.onopen = function(evt){
+        log("socket " + $name + " connected");
+        led_show($name, "#26ff26", "connected");
+    };
+
+    socket.onclose = function()
+    {
+        log("socket " + $name + " closed");
+        led_show($name, "#d90000", "closed");
+        window.setTimeout(function(){
+            socketInit($name, $url);
+        }, 2000);
+    };
+
+    socket.onmessage = function(evt){
+        led_flash($name, "#00f", "#0f0");
+        var $obj = $('#val_' + $name);
+
+        $old_val = parseFloat($obj.val());
+        $new_val = parseFloat(evt.data).toFixed(2);
+
+        // 根据数据变化， 显示上下箭头
+        $updown_obj = $obj.nextAll('.updown');
+        if($new_val > $old_val) $updown_obj.text('↑');
+        else if($new_val < $old_val) $updown_obj.text('↓');
+        else $updown_obj.text('=');
+
+        // 显示数据， 并标识为有变化， 同时触发对象的 change 事件
+        $obj.val($new_val).attr('changed', "1").trigger('change');
+
+        // 更新最小值和最大值
+        var $min_val = parseFloat($obj.attr('min_val'));
+        var $max_val = parseFloat($obj.attr('max_val'));
+
+        if($new_val < $min_val) $obj.attr('min_val', $new_val);
+        if($new_val > $max_val) $obj.attr('max_val', $new_val);
+    };
+}
+
+// 显示LED灯颜色及提示内容
+function led_show($name, $color, $desc)
+{
+    $('#led_' + $name).css("color", $color).attr('flash_enabled', '0').prop("title", $desc);
+}
+
+// LED灯闪烁
+function led_flash($name, $color1, $color2)
+{
+    $('#led_' + $name).css("color", $color1).attr('flash_enabled', '1');
+    window.setTimeout(function(){
+        var $led = $('#led_' + $name);
+        if($led.attr('flash_enabled') == '0') return;
+        $('#led_' + $name).css("color", $color2);
+    }, 200);
+}
+
+// 去除重复
+function recordsUnique()
+{
+    var $tmp = [];
+    for(var $i = 0; $i < $records.length; $i++)
+    {
+        var $found_same = false;
+        for(var $j = 0; $j < $tmp.length; $j++)
+        {
+            if($records[$i].ec == $tmp[$j].ec) $found_same = true;
+        }
+        if(!$found_same) $tmp.push($records[$i]);
+    }
+    log("unique " + $records.length + " items to " + $tmp.length + " items");
+    $records = $tmp;
+}
+
+// 绘制曲线图
+function renderChart()
+{
+    var $chartData = [];
+    for(var $i = 0; $i < $records.length; $i++)
+    {
+        $chartData.push([$records[$i].ec, $records[$i].hi]);
+    }
+
+    // 绘制曲线
+    $.plot($("#chartJiaozhun"), [$chartData],
+    {
+        lines: {show: true},    // 点之间是否连线
+        points: {show: true},   // 是否显示点
+        grid: {hoverable: true}, // 是否可以悬浮，是否可以点击
+    });
+
+    // 添加一个 Tooltip 显示容器
+    $("<div id='chartJiaozhunTooltip'></div>").css({
+        position: "absolute",
+        display: "none",
+        border: "1px solid #fdd",
+        padding: "2px",
+        backgroundColor: "#fee",
+        opacity: 0.80,
+        zIndex: 1500
+    }).appendTo("body");
+
+    // 绑定 Tooltip 事件
+    $("#chartJiaozhun").bind("plothover", function (event, pos, item)
+    {
+        if (item)
+        {
+            var x = item.datapoint[0];
+            var y = item.datapoint[1];
+
+            $("#chartJiaozhunTooltip").html("编码器: " + x + " 圈, 提升高程: " + y + " 米")
+                .css({top: item.pageY+5, left: item.pageX+5})
+                .fadeIn(200);
+        }
+        else
+        {
+            $("#chartJiaozhunTooltip").hide();
+        }
+    });
+}
+
+// 记录数据
+var $startHi = 0;
+var $records = [];
+var $recordHandle = 0;
+function record()
+{
+    // 当滑轮编码器或拉线编码器的值， 没有被标识为有更新时， 数据无效。
+    if($('#val_ec').attr('changed') != "1") return;
+    if($('#val_lx').attr('changed') != "1") return;
+
+    // 读取两个传感器的值， 并标识为已经读取。
+    var $ec_val = parseFloat($('#val_ec').attr('changed', 0).val()).toFixed(1);
+
+    // 读取拉线传感器的值 + 拉线附加长度， 作为斜边
+    var $lx_val = parseFloat($('#val_lx').attr('changed', 0).val()) + parseFloat($('#val_lx_ext').val());
+
+    // 读取水平距离, 作为一个直角边
+    var $hd_val = parseFloat($('#val_hd').val());
+
+    // 计算另一个直角边， 即为垂直高度
+    var $hi_val = Math.sqrt($lx_val * $lx_val - $hd_val * $hd_val).toFixed(2);
+
+    // 计算所得垂直高度需要减去高度零点
+    $hi_val -= $startHi;
+    $('#val_hi').val($hi_val);
+
+    $records.push({"ec": $ec_val, "hi": $hi_val});
+
+    log("record: ec: " + $ec_val + ", lx: " + $lx_val + ", hd: " + $hd_val + ", hi: " + $hi_val + ", startHi: " + $startHi);
+}
+
+// 输出日志
+function log($content)
+{
+    $('#logJiaozhun').append($content + "\r\n");
+}
+
+
+var $dist_used_type = 'hd';
+$("#btn_use_hd").click(function(){
+    $(this).hide();
+    $("#btn_use_vd").show();
+    $('#val_hd').prop('disabled', false);
+    $('#val_vd').prop('disabled', true);
+    $dist_used_type = 'hd';
+});
+
+$("#btn_use_vd").click(function(){
+    $(this).hide();
+    $("#btn_use_hd").show();
+    $('#val_hd').prop('disabled', true);
+    $('#val_vd').prop('disabled', false);
+    $dist_used_type = 'vd';
+});
+
+// 计算直角边
+
+// 当拉线编码器读数改变， 或者平面距离设置改变， 或者修改拉线附加长度后， 重新估算水平高差
+$('#val_lx_ext, #val_hd, #val_lx, #vd_val').change(function(){
+    // 以 interval 定时器的句柄作为标识， 当 $recordHandle 为 0 时， 表明没有在记录数据。
+    // 只有在未记录数据时， 可以修改此值
+    if($recordHandle != 0) return;
+
+    if($dist_used_type == 'hd' && $(this).prop('id') == 'val_hd') return;
+    if($dist_used_type == 'vd' && $(this).prop('id') == 'val_vd') return;
+
+    // 拉线编码器读数 + 拉线附加长度，作为斜边
+    var $lx_val = parseFloat($('#val_lx').val()) + parseFloat($('#val_lx_ext').val());
+
+    // if (!$("#val_hd").attr("disabled") == false)
+    if ($dist_used_type == 'hd')
+    {
+        // 水平距离， 作为一个直角边
+        var $hd_val = parseFloat($('#val_hd').val());
+        if($hd_val > $lx_val)   // 直角边长大于斜边边长， 不合理
+        {
+            $hd_val = $lx_val;  // 将水平距离（直角边）修改为斜边边长
+            $('#val_hd').val($hd_val);
+        }
+
+        // 计算另一个直角边， 即为垂直高度差
+        var $vd_val = Math.sqrt($lx_val * $lx_val - $hd_val * $hd_val).toFixed(2);
+        if(isNaN($vd_val)) $vd_val = -1;
+        $('#val_vd').val($vd_val);
+    }
+
+    // if ($("#val_vd").attr("disabled") == false)
+    if ($dist_used_type == 'vd')
+    {
+        // 水平高度差作为直角边，计算水平距离
+        var $val_vd = parseFloat($('#val_vd').val());
+        if($val_vd > $lx_val)   // 直角边长大于斜边边长， 不合理
+        {
+            $val_vd = $lx_val;  // 将水平距离（直角边）修改为斜边边长
+            $('#val_vd').val($val_vd);
+        }
+
+        // 计算另一个直角边， 即为水平距离
+        var $val_hd = Math.sqrt($lx_val * $lx_val - $val_vd * $val_vd).toFixed(2);
+        if(isNaN($val_hd)) $val_hd = -1;
+        $('#val_hd').val($val_hd);
+    }
+});
+
+$('#btn_set_ext_0').click(function(){
+    $('#val_lx_ext').val('0');
+});
+
+$('#btn_set_ext_10').click(function(){
+    $('#val_lx_ext').val('10');
+});
+
+// 清除日志
+$('#btnClearLog').click(function(){
+    $('#logJiaozhun').val('');
+});
+
+// 开始记录
+$('#btn_start').click(function(){
+    log("start");
+    $('#btn_start').prop('disabled', true);
+    $('#btn_stop').prop('disabled', false);
+    $('#btn_submit').prop('disabled', true);    // 未完成记录前， 禁止提交
+
+    $('#val_lx_ext').prop('readonly', true);
+    $('#val_hd').prop('readonly', true);
+
+    $startHi = parseFloat($('#val_vd').val()); // 将当前的垂直高度， 作为高度零点
+
+    // 清空原来存储的记录
+    $records = [];
+    $recordHandle = window.setInterval(record, 100);    // 开始记录数据
+});
+
+// 完成记录
+$('#btn_stop').click(function(){
+    log("stop");
+    $('#btn_start').prop('disabled', false);    // 允许重新开始记录数据
+    $('#btn_stop').prop('disabled', true);
+    $('#btn_submit').prop('disabled', false);   // 允许提交数据
+
+    $('#val_lx_ext').prop('readonly', false);
+    $('#val_hd').prop('readonly', false);
+
+    window.clearInterval($recordHandle);    // 停止记录数据
+    $recordHandle = 0;  // 将 interval 定时器句柄置零， 以此作为已完成记录的标识
+
+    recordsUnique();    // 去除重复
+
+    renderChart();  // 绘制曲线图
+    $('#btnShowChart').prop('disabled', false); // 允许显示曲线图
+});
+
+// 提交数据
+$('#btn_submit').click(function(){
+    log("submit");
+    $('#btn_start').prop('disabled', false);    // 允许再次开始记录数据
+    $('#btn_stop').prop('disabled', true);
+    $('#btn_submit').prop('disabled', true);    // 禁止重复提交
+
+    $('#val_lx_ext').prop('readonly', false);
+    $('#val_hd').prop('readonly', false);
+
+    // 组织数据并向后台提交
+    var $json = JSON.stringify($records);
+    log("submit: " + $json);
+    $.ajax({
+        url: '?um=qh&ua=jiaozhun_save',
+        dataType: 'text',
+        type: 'POST',
+        data: "json=" + $json,
+        success: function($data)
+        {
+            ServiceApi.request("ServiceConfig.set",{"module": "QH", "service": "QHCalc", "key": "QHconfig/jiaozhun_type", "val": 1},function(){});
+            log("submit return " + $data);
+            if ($data=='ok') return alert("保存成功");
+
+            alert("保存执行失败: " + $data);
+            $('#btn_submit').prop('disabled', false);   // 提交失败时， 启用提交按钮， 允许重新提交
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown)
+        {
+            alert("提交失败: " + textStatus + errorThrown);
+            $('#btn_submit').prop('disabled', false);   // 提交失败时， 启用提交按钮， 允许重新提交
+        }
+    }); 
+});
+
+
+</script>

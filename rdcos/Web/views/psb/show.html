@@ -1,0 +1,499 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>插板机 - ENHRDC</title>
+<link href="./css/bootstrap.min.css" rel="stylesheet">
+<script src="./js/jquery.min.js"></script>
+<link rel="stylesheet" href="./fonts/font-awesome/css/font-awesome.min.css">  
+<script src="./js/bootstrap.min.js"></script>
+<style type="text/css">
+.status{
+    font-size: 36px;
+    word-spacing: 15px;
+    padding-left: 15px;    
+}
+.tit{
+    
+    display:inline-block;
+    width: 100px;
+    line-height: 30px;
+}
+.int{color:#fff;font-size:20px;background:#2cade5;}
+.err{color: #f00;}
+.ok{color: #0d0;}
+.LT{height: 10%;text-align: justify;}
+.LM,.LB{height: 40%;font-size: 20px;line-height: 40px;}
+.LM div,.LB div{margin:10px;border: 1px solid #efefef;padding-left:10px;}
+.unit{font-size: 11px;position: relative;top:10px;}
+/*.L{background: #fff;}
+.M{background: #f5f5f5;}
+.R{background: #fff;}*/
+/*body{background: #404a59;}*/
+
+
+</style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row clearfix" style="overflow:hidden;">
+        <div class="col-md-3 col-xs-3 L">
+            <div class="row LT status">
+            <i class="fa gnss1 fa-globe ok" id="gnss"></i>
+            <i class="fa ec fa-cog fa-spin ok" id="code"></i>
+            <i class="fa an fa-adn ok" id="dianan"></i>
+            <i class="fa net fa-signal ok" id="network"></i>                    
+            </div>
+
+            <div class="row LM">
+                <div>
+                <span class="tit">当前桩号</span>
+                
+                <span id="curr_idx" class="int badge">1</span>
+                </div>
+                <div>
+                <span class="tit">实时深度</span>
+                <span id="depth" class="int badge">0</span>
+                </div>
+                <div>
+                <i class="fa fa-bolt"></i>&nbsp;<span class="tit">实时电流</span>                
+                <span id="an" class="int badge">0</span>
+                </div>
+            </div>
+            <hr>
+            <div class="row LB">
+                <h4 style="margin-left:20px;">前一桩信息</h4>
+                <div>
+                <span class="tit">插桩深度</span>
+                <span id="pre_depth" class="int badge">0</span>
+                </div>
+                <div>
+                <span class="tit">最大电流</span>
+                <span id="pre_an" class="int badge">0</span>
+                </div>
+                <div>
+                <span class="tit">插桩用时</span>
+                <span id="pre_costtime" class="int badge">0</span>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6 col-xs-6 column M">
+        <div id="chart" style="height:100%; width: 100%"></div>
+        </div>
+        <div class="col-md-3 col-xs-3 column R" >
+
+            <img id="imgpsb" src="./img/psb2.png" style="position:relative;height:90%;top:50px;z-index: 10">
+            <img id="imgzhuang" src="./img/psbzhuang2.png" style="position: absolute; top: 100px; left:25px;z-index: 1">
+           
+
+        </div>
+    </div>
+</div>
+<img src="./img/chakanhistory.png" style="display: none;" data-toggle="modal" data-target=".bs-example-modal-lg" id="btn_histry"  onclick="loadhistory()" class="right_img">
+<!-- Modal -->
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="myModal" >
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" style="font-size: 40px">&times;</span></button>
+    <h4 class="modal-title" id="myModalLabel">夯击历史记录</h4>
+  </div>
+      <div class="modal-body">
+         <div class="table-responsive">
+         <table class="table table-hover table-expandable table-history">               
+            <thead>
+                <tr>
+                    <th>桩号</th>
+                    <th>插桩深度(米)</th>                    
+                    <th>最大电流(安)</th>
+                    <th>插桩用时(秒)</th>
+                    <th>时间</th>
+                </tr>
+            </thead>
+            <tbody id="historylist">
+                
+            </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<script src="./js/ServiceApi.js"></script>
+<script src="./js/echarts.min.js"></script>
+<script type="text/javascript">
+var ENHChart = echarts.init(document.getElementById('chart'));
+var Point;
+var zoom = 600;//缩放比例系数
+var $symbol_size = 15;
+var night = false; //夜间模式
+$.get('./geo/airport.json', function (geoJson) {
+    echarts.registerMap('airport', geoJson);
+    });
+
+// ENHChart.hideLoading();
+option = {
+    backgroundColor: '#fff',
+    // backgroundColor: '#404a59',
+    color: [
+         '#fec42c','#44ff44', '#ff4444', '#4444ff'
+    ],
+    title: {
+        text:"xitong",
+        x:'left',
+        y:'bottom',
+        textStyle: {
+            color: '#555',
+            fontSize: 14,
+        }
+    },
+    tooltip: {
+        trigger: 'item',
+        formatter: function (params) {
+            // return params.value[2];
+            // p = [$data[i].lon,$data[i].lat,$data[i].idx,$data[i].gpst,$data[i].elevation,$data[i].depth,$data[i].an];
+
+            var value = params.value;
+            return '<div style="border-bottom: 1px solid rgba(255,255,255,.3); font-size: 18px;padding-bottom: 7px;margin-bottom: 7px">'
+                + value[2]
+                + '</div>'
+                + '深度：' + value[5] + '米<br>'
+                + '电流：' + value[6] + '安<br>'
+                + '耗时：' + value[7] + '秒<br>'
+                + '时间：' + value[3] + '<br>';
+        }
+    },
+    
+    toolbox:{
+        feature :{
+            // dataZoom:{
+            //     show:true
+            // },
+            myTool1: {
+                show: true,
+                title: '放大',
+                icon: 'path://M1216 576v128q0 26 -19 45t-45 19h-256v256q0 26 -19 45t-45 19h-128q-26 0 -45 -19t-19 -45v-256h-256q-26 0 -45 -19t-19 -45v-128q0 -26 19 -45t45 -19h256v-256q0 -26 19 -45t45 -19h128q26 0 45 19t19 45v256h256q26 0 45 19t19 45zM1536 640q0 -209 -103 -385.5 t-279.5 -279.5t-385.5 -103t-385.5 103t-279.5 279.5t-103 385.5t103 385.5t279.5 279.5t385.5 103t385.5 -103t279.5 -279.5t103 -385.5z',
+                onclick: function (){
+                    // alert('myToolHandler1')
+                    zoom += 100;
+                    console.log(zoom);
+                },                
+            },
+            myTool2: {
+                show: true,
+                title: '缩小',
+                icon: 'path://M1216 576v128q0 26 -19 45t-45 19h-768q-26 0 -45 -19t-19 -45v-128q0 -26 19 -45t45 -19h768q26 0 45 19t19 45zM1536 640q0 -209 -103 -385.5t-279.5 -279.5t-385.5 -103t-385.5 103t-279.5 279.5t-103 385.5t103 385.5t279.5 279.5t385.5 103t385.5 -103t279.5 -279.5 t103 -385.5z',
+                onclick: function (){
+                    // alert('myToolHandler2')
+                    if(zoom > 100)zoom  -= 100;
+                    if(zoom <= 100 && zoom > 10)zoom -= 10;
+                    if(zoom <=10 && zoom > 0) zoom -= 1;
+                    console.log(zoom);
+                }
+            },
+            myTool3: {
+                show: true,
+                title: '列表',
+                icon: 'path://M1536 192v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 704v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 1216v-128q0 -26 -19 -45 t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45z',
+                onclick: function (){
+                    $('#btn_histry').click();
+                }
+            },
+            myTool4: {
+                show: true,
+                title: '昼夜切换',
+                icon: 'path://M1262 233q-54 -9 -110 -9q-182 0 -337 90t-245 245t-90 337q0 192 104 357q-201 -60 -328.5 -229t-127.5 -384q0 -130 51 -248.5t136.5 -204t204 -136.5t248.5 -51q144 0 273.5 61.5t220.5 171.5zM1465 318q-94 -203 -283.5 -324.5t-413.5 -121.5q-156 0 -298 61 t-245 164t-164 245t-61 298q0 153 57.5 292.5t156 241.5t235.5 164.5t290 68.5q44 2 61 -39q18 -41 -15 -72q-86 -78 -131.5 -181.5t-45.5 -218.5q0 -148 73 -273t198 -198t273 -73q118 0 228 51q41 18 72 -13q14 -14 17.5 -34t-4.5 -38z',
+                onclick: function (){
+                    // alert("夜间模式");
+                    // body{background: #080c10;color: #424952;}
+                    if(!night)
+                    {
+                        option.backgroundColor='#131314';
+                        option.geo.itemStyle.normal.color = '#131314';
+                        option.geo.itemStyle.emphasis.color = '#131314';
+                        ENHChart.setOption(option);
+                        $('body').css("background","#131314");
+                        $('body').css("color","#525252");
+                        night = !night;
+                    } 
+                    else
+                    {
+                        option.backgroundColor='#ffffff';
+                        option.geo.itemStyle.normal.color = '#fff';
+                        option.geo.itemStyle.emphasis.color = '#fff';
+
+                        ENHChart.setOption(option);
+                        $('body').css("background","#ffffff");
+                        night = !night;
+                    }
+                }
+            }, 
+            myTool5: {
+                show: true,
+                title: '刷新',
+                icon: 'path://M1511 480q0 -5 -1 -7q-64 -268 -268 -434.5t-478 -166.5q-146 0 -282.5 55t-243.5 157l-129 -129q-19 -19 -45 -19t-45 19t-19 45v448q0 26 19 45t45 19h448q26 0 45 -19t19 -45t-19 -45l-137 -137q71 -66 161 -102t187 -36q134 0 250 65t186 179q11 17 53 117 q8 23 30 23h192q13 0 22.5 -9.5t9.5 -22.5zM1536 1280v-448q0 -26 -19 -45t-45 -19h-448q-26 0 -45 19t-19 45t19 45l138 138q-148 137 -349 137q-134 0 -250 -65t-186 -179q-11 -17 -53 -117q-8 -23 -30 -23h-199q-13 0 -22.5 9.5t-9.5 22.5v7q65 268 270 434.5t480 166.5 q146 0 284 -55.5t245 -156.5l130 129q19 19 45 19t45 -19t19 -45z',
+                onclick: function (){
+                    location.reload();
+                }
+            }, 
+            myTool6: {
+                show: false,
+                title: '下载',
+                icon: 'path://M4.7,22.9L29.3,45.5L54.7,23.4M4.6,43.6L4.6,58L53.8,58L53.8,43.6M29.2,45.1L29.2,0',
+                onclick: function (){
+                    alert("数据下载");
+                }
+            },            
+        },
+        itemSize : 40,
+        orient : 'vertical',
+    },
+    legend: {
+        y: 'top',
+        x: 'left',
+        data:['待定桩','合格桩','不合格桩','正在施工'],
+        orient: 'vertical',
+        textStyle: {
+            color: '#555',
+            fontSize: 14
+        } 
+    },
+
+    geo: {
+        map: 'airport',
+        center: [104.443626173,30.32664314],
+        // roam: 'scale',
+        background:'#131314',
+        itemStyle: {
+            normal: {
+                borderColor: '#111',
+                color: '#fff',
+            },
+            emphasis: {
+                color: '#fff'
+            }
+
+        }
+    },
+    series: [
+        {
+            name: '待定桩',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: [],
+            symbolSize: $symbol_size,
+            label: {
+                normal: {
+                    show: false
+                }
+            },
+            itemStyle: {
+                emphasis: {
+                    borderColor: '#f0f',
+                    borderWidth: 1
+                }
+            }
+        },
+        {
+            name: '合格桩',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: [],
+            symbolSize: $symbol_size,
+            label: {
+                normal: {
+                    show: false
+                }
+            },
+            itemStyle: {
+                emphasis: {
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }
+            }
+        },
+        {
+            name: '不合格桩',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: [],
+            symbolSize: $symbol_size,
+            label: {
+                normal: {
+                    show: false
+                }
+            },
+            itemStyle: {
+                emphasis: {
+                    borderColor: '#f00',
+                    borderWidth: 1
+                }
+            }
+        },
+        {
+            name: '正在施工',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: [],
+            symbolSize: $symbol_size,
+            label: {
+                normal: {
+                    show: false
+                }
+            },
+            itemStyle: {
+                normal: {
+                    color: '#00f',
+                    borderWidth: 2
+                },
+                emphasis: {
+                    color: '#00f',
+                    borderWidth: 1
+                }
+            }
+        },
+    ]
+}
+
+var high = 0;
+var PrePoint;//前一点信息
+var tech = 0;
+function load_tech(){
+    url = "?um=psb&ua=get_tech";
+    $.post(url,{},function($tech){        
+        tech = $tech;
+    });
+}
+load_tech();
+console.log("-----"+tech+"------");
+
+function load_data(){
+    url = "?um=psb&ua=get_point_data";
+    $.post(url,{},function($data){
+        PrePoint = $data[$data.length-1];
+        $('#pre_depth').html(PrePoint.depth);
+        $('#pre_an').html(PrePoint.an);
+        $('#pre_costtime').html(PrePoint.costtime);
+        $('#curr_idx').html($data.length+1);
+        Plist0 = option.series[0].data;
+        Plist1 = option.series[1].data;
+        Plist2 = option.series[2].data;
+        for(i in $data){
+            p = [$data[i].lon,$data[i].lat,$data[i].idx,$data[i].gpst,$data[i].elevation,$data[i].depth,$data[i].an,$data[i].costtime];
+            //没有工艺要求的话，待定
+
+            // console.log(tech+"ddddddddddddddd");
+            if(tech == 0) {
+                Plist0.push(p);
+                continue;
+            }
+            if($data[i].depth >= tech)
+                Plist1.push(p);
+            else 
+                Plist2.push(p);
+        }
+    });
+}
+
+load_data();
+ServiceApi.request("Cache.get", {"key": "PSB"}, function($seq, $result, $info, $data){
+    /******状态相关**********/
+    if      ($data.status.GNSS1 == 1) quality = "单点定位";
+    else if ($data.status.GNSS1 == 2) quality = "码差分";
+    else if ($data.status.GNSS1 == 3) quality = "浮点解";
+    else if ($data.status.GNSS1 == 4) quality = "精准解";
+    else                              quality = "定位异常"; 
+        
+    updatestatus("gnss1",$data.status.GNSS1);
+    updatestatus("ec",$data.status.EC);
+    updatestatus("an",$data.status.AN);
+    updatestatus("net",$data.status.NET);
+
+    if($data.status.ECC == 0){
+         $('.fa-cog').removeClass("fa-spin");
+    }
+    else
+    {
+         $('.fa-cog').addClass("fa-spin");
+    }
+
+    /****************************/ 
+    p = [$data.lon,$data.lat,0];
+    console.log(option.geo.center);
+
+    option.title.text = "卫星授时:"+$data.gpst + " 定位质量："+quality;
+    option.geo.zoom = zoom;
+    Point = option.series[3].data;    
+
+    if($data.lon != undefined && $data.lat != undefined)  {
+        Point[0]=p;
+    }
+        option.geo.center = [$data.lon,$data.lat];
+        // Point[0]=p;
+    ENHChart.setOption(option);
+    $('#depth').html($data.depth);
+    $('#an').html($data.An);
+
+
+
+    hammer_high($data.depth);
+    if($data.new_point == 1)load_data();
+
+}, 500);
+
+
+function loadhistory(){
+    var html = '';
+    $('#historylist').html('');
+    $.post("?um=psb&ua=get_history_point",{},function(data){
+
+        for(i in data)
+        {   
+            html += "<tr><td>"+data[i].idx+"</td><td>"+data[i].depth+"</td><td>"+data[i].an+"</td><td>"+data[i].costtime+"</td><td>"+data[i].gpst+"</td></tr>";   
+      
+        }
+
+        $('#historylist').html(html);
+    });
+
+}
+// 锤子动画
+function hammer_high(high){
+    // if(high > 0)high++;
+    if (high <= 0)
+    {
+        $('#imgzhuang').stop().animate({top:'15%'}, 1000);
+    }
+    else
+    {
+        var highTop = high / 12 * 150;
+        if (highTop < 15)
+        {
+            highTop = 15;
+        }
+        if(highTop > 95) highTop = 95;
+        $('#imgzhuang').stop().animate({top:''+highTop+'%'}, 1000);
+
+    }
+}
+
+function updatestatus(icon,status){
+    if(status == 0){        
+        $('.'+icon+'').css("color","#f00");
+    }
+    else
+    {
+        $('.'+icon+'').css("color","#0d0");
+    }
+}
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,971 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>强夯机车载平板 - ENHRDC</title>
+<link href="./css/bootstrap.min.css" rel="stylesheet">
+<link href="./css/bootstrap-datepicker3.min.css" rel="stylesheet">
+<script src="./js/jquery.min.js"></script>
+<!-- INCLUDES -->
+<link rel="stylesheet" href="./css/bootstrap-table-expandable.css">
+<link rel="stylesheet" href="./css/peizhi.css">
+<link rel="stylesheet" href="./fonts/font-awesome/css/font-awesome.min.css">  
+<script src="./js/bootstrap-table-expandable.js"></script>
+<script src="./js/bootstrap.min.js"></script>
+<style> 
+    body,html{height:100%; margin:0px; padding:0px;  overflow:hidden;}
+    #left,#right{width:24%;  height:100%; border: 1px solid black;float:left; height:100%;} 
+    #center{width: 52%;height:100%; border: 1px solid black;float:left;}
+    .left-top{height: 45%;border-bottom: 1px solid black;}
+    .hammer{height: 45%;border-bottom: 1px solid black;}
+    .hammer-text{float:left; width: 45%;font-size: 2rem;line-height:2px;text-align: center; margin-top: 15%;"line-height":10px; font-weight: bold;}
+    .hammer_number{float:left;font-size: 6rem; text-align: center;position: absolute;top: 12%;left: 13%;font-weight: bold;}
+    .hammer-text-average{font-size:1.5rem;line-height:10px;font-weight:bold;
+      margin:0px 0px 0px 10px;line-height:30px;font-weight: bold;}
+    .left-end{width:24%; position: absolute; left:0;}
+    #center .progress{position: absolute;left: 30%;bottom: 3%;border: 1px solid #000;width: 45%;min-width: 20%;background: gray;}
+    .progress-bar{background: green;text-align: center;}
+    .status_img{height: 30px; margin:0px 0px 0px 10px;}
+    .shit{height: 80px;}
+    .hammer-text-average p{
+        margin: 15px 0px 0px 0px;
+        padding: 0 0px 0 25px;
+    }
+    .right_img{
+        height: 60px;
+        margin:5px 5px 5px 5px;
+    }
+    .tbls{display: none;}
+    /*.modal-body{
+        width: 90%;
+        margin:  0 auto;
+    }*/
+    @media only screen and (max-width: 600px) { 
+    .table { 
+    width: 100%; 
+    
+        } 
+    } 
+    #status{
+        padding-left: 20px;
+    }
+    #status span{
+       color: red;font-size: 1px;
+       display: none;
+    }
+    #status span img{
+    width: 25px;height: 25px;
+    }
+</style> 
+</head> 
+<body id="content" onload="getDevStatus()"> 
+<div id="left" onload="yincangshuaxin()">
+    <div id="status" >
+        <span  id="gnss1_no"  ><img src="img/gnss_gps1_red.png">0</span>
+        <span id= "gnss1_yes" ><img src="img/gnss_gps2.png" >1</span>
+        <span id= "gnss1_yes2" ><img src="img/gnss_gps2.png" >2</span>
+        <span id= "gnss1_yes3" ><img src="img/gnss_gps2.png" >3</span>
+        <span id= "gnss1_yes4" ><img src="img/gnss_gps2.png" >4</span>
+        <span  id="gnss2_no"  ><img src="img/gnss_gps2_red.png" >0</span>
+        <span id= "gnss2_yes" ><img src="img/gnss_gps2_black.png" >1</span>
+        <span id= "gnss2_yes2" ><img src="img/gnss_gps2_black.png" >2</span>
+        <span id= "gnss2_yes3" ><img src="img/gnss_gps2_black.png" >3</span>
+        <span id= "gnss2_yes4" ><img src="img/gnss_gps2_black.png" >4</span>
+        <span id= "EC" ><img src="img/bianmaqired.png" ></span>
+        <span id= "EC0" ><img src="img/bianmaqigreen.png" ></span>
+        <span id= "EC1" ><img src="img/bianmaqigreen1.png" ></span>
+        <span id= "EC2" ><img src="img/bianmaqigreen2.png" ></span>
+        <span id= "CSQ" ><img src="img/network0.png" ></span>
+        <span id= "CSQ1" ><img src="img/network1.png" ></span>
+        <span id= "CSQ2" ><img src="img/network2.png" ></span>
+        <span id= "CSQ3" ><img src="img/network3.png"></span>
+        <span id= "CSQ4" ><img src="img/network4.png" ></span>
+        <span id= "CSQ5" ><img src="img/network5.png" ></span>
+        <span id= "NET" ><img src="img/timg.png" ></span>
+    </div>
+    <div class="left-top">
+         <div class="hammer">
+          <div class="hammer-text">
+             <p style="font-size: 1.8rem;height: 30px">夯击</p>
+             <p style="font-size: 1.8rem;height: 30px">次数</p>
+          </div>
+            <span class="hammer_number" id="hit_count" style="display: inline-block;bottom: 20px;height: 40px;margin-bottom: 20px;">0</span>
+        </div>
+        <div class="hammer-text-average">
+            <P style='margin-top: 15px'><strong> 强夯机：</strong><strong id="device_name"></strong></P>
+            <P><strong> 当前锤高：</strong><strong id="hammer_high">0</strong>米</P>
+            <P style="display: none;"><strong> 总沉降量：</strong><strong id="sum_sink">0</strong>米</P>
+            <P style="display: none;"><strong> 上次沉降量：</strong><strong  id="last_sink">0</strong>米</P>
+            <!-- <P style="font-size: 14px;color: red;">置换法沉降量仅供参考</P> -->
+
+        </div>
+    </div>
+    <div class="left-end" style="margin-top: 1px;">
+      <canvas id="canvas" width="300" height="300">canvas nedded</canvas>
+    </div>
+</div> 
+<div id="center"> 
+    <iframe id="ifdd" name="c" height="100%" width="100%" border="0" frameborder="0" src="http://192.168.0.35/?um=qh&ua=ipad"></iframe>
+</div> 
+<div id="right">
+    <div style="position: absolute; top: 15px; left:90%;float: right;z-index:9999;width: 80px">
+        <img src="./img/fangda.png" onclick="zoomin()" class="right_img"> 
+        <img src="./img/fangxiao.png" onclick="zoomout()" class="right_img"> 
+        <img src="./img/chongzhi.png" onclick="strat_over_point()" class="right_img"> 
+        <img src="./img/chakanhistory.png" data-toggle="modal" data-target=".bs-example-modal-lg" id="hammer_histry"  onclick="loadhistory()" class="right_img">
+        <img src="./img/shezhi.png" id="shezhi" class="right_img">
+    </div>
+<div class="theme-popover" id="peizhi">
+     <div class="theme-poptit">
+          <a href="javascript:;" title="关闭" class="close" style="font-size: 40px;font-family: microsoft yahei;font-weight: bold;">&times;</a>
+          <h1>强夯配置选择</h1>
+     </div>
+     <div class="theme-popbod dform">
+           <form class="theme-signin" name="loginform" action="" method="post">
+                <label style="font-size: 30px;height: 40px;line-height: 40px;height: 40px">夯点类型:</label>
+                <SELECT  NAME="hammer_type"  id = "select1" onChange="getCity()" > 
+                    <OPTION value="0" style="font-size: 20px">请选择</OPTION> 
+                    <OPTION value="1" { if $QHconf.hammer_type == 1 } selected="selected" { /if } style="width: 30%;height:20px;font-size: 20px">点夯</OPTION> 
+                    <OPTION value="2" { if $QHconf.hammer_type == 2 } selected="selected" { /if } style="width: 30%;height:20px;font-size: 20px">强夯置换</OPTION>
+                    <OPTION id="manhang" value="3" name='0' { if $QHconf.hammer_type == 3 } selected="selected" { /if } style="width: 30%;height:20px;font-size: 20px">满夯</OPTION>    
+                </SELECT>
+                <SELECT id="select2"  NAME="points_arrangement" style="display: none;">    
+                    <OPTION value="0" style="width: 30%;height:20px;font-size: 20px">请选择点夯类型</OPTION>
+                    <OPTION VALUE="2" id="sanjiao" { if $QHconf.points_arrangement == 2 } selected="selected" { /if } style="width: 30%;height:20px;font-size: 20px">正三角形</OPTION>
+                    <OPTION VALUE="1" id="zhangfang" { if $QHconf.points_arrangement == 1 } selected="selected" { /if } style="width: 30%;height:20px;font-size: 20px">正方形</OPTION>
+                </SELECT>
+                <label id="label_2" style="font-size: 30px;height: 40px;line-height: 40px;height: 40px">夯点间距:</label>
+                <select id="select3" name="points_spac">
+                    <option value="3" { if $QHconf.points_spac == 3 } selected="selected" { /if }>3</option>
+                    <option value="4" { if $QHconf.points_spac == 4 } selected="selected" { /if }>4</option>
+                    <option value="5"{ if $QHconf.points_spac == 5 } selected="selected" { /if }>5</option>
+                    <option value="6"  { if $QHconf.points_spac == 6 } selected="selected" { /if }>6</option>
+                    <option value="7" { if $QHconf.points_spac == 7 } selected="selected" { /if }>7</option>
+                    <option value="8"{ if $QHconf.points_spac == 8 } selected="selected" { /if }>8</option>
+                </select>
+                <input class="btn" type="submit" name="submit" value=" 提 交 " onclick="tijiao()" />
+           </form>
+     </div>
+</div>
+<div class="theme-popover" id="yincang" style="display: none;">
+    <audio  autoplay="autoplay" loop="loop" id="audio">
+      <source src="./img/800b3d43a9.mp3" type="audio/mpeg" />
+    </audio>
+    
+     <div class="theme-poptit">
+          <!-- <a href="javascript:;" title="关闭" class="close">×</a> -->
+          <h1 style="color: red">强夯配置选择</h1>
+     </div>
+     <div class="theme-popbod dform">
+           <form class="theme-signin" name="loginform" action="" method="post">
+                <div class="setting_list" id="hangdianleixing" onChange="gethangdianleixing()">
+                    <label style="font-size: 30px;height: 40px;line-height: 40px;height: 40px">夯点类型</label>
+                     <div style="width: 150px;float: left;">
+                        <label><input type="radio"   name="hammer_type"  value="3" style="width: 30%;height:26px;" { if $QHconf.hammer_type == 3 } checked="checked" { /if }  /><span style="font-size: 26px">满夯</span></label> 
+                    </div>
+                    <div style="width: 150px;float: left;height: 40px">
+                         <label><input type="radio"   name="hammer_type"  value="1" style="width: 30%;height:26px;" { if $QHconf.hammer_type == 1 } checked="checked" { /if }  /><span style="font-size: 26px">点夯</span></label>
+                    </div>
+                    <div style="width: 150px;float: left;height: 40px">
+                         <label><input type="radio"   name="hammer_type"  value="2" style="width: 30%;height:26px;" { if $QHconf.hammer_type == 2 } checked="checked" { /if }/><span style="font-size: 26px">强夯置换</span></label>
+                    </div>
+                </div><br/>
+                <div id="paidianxingzhuang" style="display: none;">
+                    <label style="font-size: 30px;height: 40px;line-height: 40px;height: 40px">排点形状选择</label>
+                    <div style="width: 150px;float: left;height: 40px;margin-top: 30px">
+                        <label><input type="radio"   name="points_arrangement"  value="2" style="width: 30%;height:26px;font-size: 26px" { if $QHconf.points_arrangement == 2 } checked="checked" { /if } /><span style="font-size: 26px">三角形</span></label>
+                    </div>
+                    <div style="width: 150px;float: left;height: 40px;margin-top: 30px">
+                        <label><input type="radio"   name="points_arrangement"  value="1" style="width: 30%;height:26px;"  { if $QHconf.points_arrangement == 1 } checked="checked" { /if }/><span style="font-size: 26px">正方形</span></label>
+                    </div>
+                </div>
+                <input class="btn btn-primary" type="button"  value=" 提 交 " onclick="queren()"  data-loading-text="Loading..."/>
+           </form>
+     </div>
+</div>
+
+<div class="theme-popover-mask"></div>
+    </div>
+    <div id="divQianghangji" class="tool" style="right: 0px; left: 0px; pointer-events: none; overflow: hidden; top: 40px; bottom: 100px;"> 
+    <img id="imgQianghang" src="./img/qianghangji_full1.png" style="height:100%; position:absolute; top:2px; left:79%; display: none">
+    <img id="imgdaishiQianghang" src="./img/daishiqianghangji.png" style="height:100%; position:absolute; top:-5px; left:76%;">
+    <img id="imgChuizi" src="./img/qianghangchui.png" style="height: 100%; position: absolute; top: 0px; left:77%;">
+    </div>
+</div>
+</div>
+<!-- Modal -->
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="myModal" >
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" style="font-size: 40px">&times;</span></button>
+    <h4 class="modal-title" id="myModalLabel">夯击历史记录</h4>
+  </div>
+      <div class="modal-body">
+         <div class="table-responsive">
+         <table class="table table-hover table-expandable table-history">               
+            <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>夯击数</th>
+                    <th>用时</th>
+                    <th>总沉降量</th>
+                    <th>最后沉降量</th>
+                    <th>次后沉降量</th>
+                    <th>平均落距</th>
+                </tr>
+            </thead>
+            <tbody id="historylist">
+                
+            </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<input type="hidden" id="setdataid" value="1">
+</body>
+<!-- 屏蔽js错误 -->
+ <script language="javascript">
+    function killErrors()
+    {
+        setreload();
+        return true;
+    }
+    window.onerror = killErrors;
+</script>
+<script src="./js/bootstrap.min.js"></script>
+<script src="./js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="./js/GpsPoint.js"></script>
+<script type="text/javascript" src='./js/ServiceApi.js'></script>
+<script type = "text/javascript">
+//   类型选择显示不同界面函数处理
+function gethangdianleixing(){
+   if($('input:radio[name="hammer_type"]:checked').val() == '1'){
+        $("#paidianxingzhuang").show();
+    }else if ($('input:radio[name="hammer_type"]:checked').val() == '2') {
+        $("#paidianxingzhuang").show();
+    }else if ($('input:radio[name="hammer_type"]:checked').val() == '3') {
+        $("#paidianxingzhuang").hide();
+    }
+}
+
+//  提交处理函数
+function queren(){
+    var data = {};
+    if ($('input:radio[name="hammer_type"]:checked').val() !=3) {
+        data = {
+            'hammer_type' : $('input:radio[name="hammer_type"]:checked').val(),
+            'points_arrangement' : $('input:radio[name="points_arrangement"]:checked').val()
+        }
+    }else{
+        data = {
+            'hammer_type' : $('input:radio[name="hammer_type"]:checked').val()
+        }
+    }
+
+     setconf($('input:radio[name="hammer_type"]:checked').val());
+     // alert('设置成功');
+     $("#yincang").hide();
+     document.getElementById('audio').pause();
+}
+ // 1: 点夯
+// 2: 置换
+// 3: 满夯
+// 根据夯击方式同步强夯配置参数
+function setconf(hammer_type) {
+    console.log(hammer_type);
+    if (hammer_type==1) {
+        var high_min=4;
+        var gps_dist_min=2;
+        var points_spac=4;
+        var points_arrangement=1;
+        var radius=1.3;
+    }else if (hammer_type==2) {
+        var high_min=5;
+        var gps_dist_min=2;
+        var points_spac=4;
+        var points_arrangement=2;
+        var radius=0.7;
+    }else if (hammer_type==3) {
+        var high_min=4;
+        var gps_dist_min=1;
+        var points_spac=4;
+        var points_arrangement=1;
+        var radius=1.4;
+    }
+   ServiceApi.request("ServiceConfig.set",{"module": "QH", "service": "QHCalc", "key": "QHconfig/high_min", "val": high_min});
+   ServiceApi.request("ServiceConfig.set",{"module": "QH", "service": "QHCalc", "key": "QHconfig/gps_dist_min", "val": gps_dist_min});
+   ServiceApi.request("ServiceConfig.set",{"module": "QH", "service": "QHCalc", "key": "QHconfig/points_spac", "val": points_spac});
+   ServiceApi.request("ServiceConfig.set",{"module": "QH", "service": "QHCalc", "key": "QHconfig/points_arrangement", "val": points_arrangement});
+   ServiceApi.request("ServiceConfig.set",{"module": "QH", "service": "QHCalc", "key": "QHconfig/radius", "val": radius});
+   ServiceApi.request("ServiceConfig.set",{"module": "QH", "service": "QHCalc", "key": "QHconfig/hammer_type", "val": hammer_type});
+}
+
+ //编码器正反转取值判断
+
+var $socket = null;
+var ec_arr = [];
+socketInit("cache", "ws://192.168.0.35:1160");
+function socketInit($name, $url)
+{
+    $socket = new WebSocket($url);
+
+    $socket.onopen = function(){
+        console.log("socket connected");
+        request("val" , {"key" : "Sensor:Encoder:data"});
+    };
+
+    $socket.onclose = function()
+    {
+        console.log("socket closed");
+        window.setTimeout(function(){
+            socketInit($name, $url);
+        }, 2000);
+    };
+
+    $socket.onmessage = function($evt){
+        var $reply = $.parseJSON($evt.data);
+        var $reply_action = $reply.action;
+        var $reply_data = $reply.data;
+            reply_val($reply_data);
+    
+        
+        
+    };
+}
+function reply_val($key_val)
+{
+    var $key = $key_val.key;
+    var $val = $key_val.val;
+   // console.log($val);
+    //var $valid_key = validKey($key);
+    if($val == undefined){
+        $("#EC").show();
+        $("#EC2").hide();
+        $("#EC1").hide();
+        $("#EC0").hide();
+        return false;
+    }
+    
+    var a = parseFloat($val);
+    ec_arr.push(a);
+    console.log("ec_arr push: " + a + ", ec_arr.length: " + ec_arr.length);
+    for( var i = 0 ; i<ec_arr.length; i++){
+        if (ec_arr[i]>ec_arr[i-1]) {
+            $("#EC1").show();
+            $("#EC2").hide();
+            $("#EC0").hide();
+            $("EC0").hide();
+        }else if (ec_arr[i]<ec_arr[i-1]) {
+            $("#EC2").show();
+            $("#EC0").hide();
+            $('#EC').hide();
+            $("#EC1").hide();
+        }else{
+         $("#EC0").show();
+        $("#EC1").hide();
+        $("#EC").hide();
+        $("#EC2").hide();   
+        }
+    }
+    window.setTimeout(function(){
+        request("val", {"key" : "Sensor:Encoder:data"});
+    }, 1000);
+    //console.log($val);
+   
+}
+
+function request($action, $params)
+{
+    var $request = {"action": $action, "params": $params};
+    $socket.send(JSON.stringify($request));
+}
+
+//夯点置换处理
+jQuery(document).ready(function($) {
+    $('#shezhi').click(function(){
+        $('.theme-popover-mask').fadeIn(100);
+        $('#peizhi').slideDown(200);
+        var peizhi = $("#select1").val();
+        if (peizhi!=3) $('#select2').show();
+    })
+    $('.theme-poptit .close').click(function(){
+        $('.theme-popover-mask').fadeOut(100);
+        $('#peizhi').slideUp(200);
+    })
+
+})
+//获取下拉值值做相应判断
+function getCity(){
+    if ($('#select1 option:selected').text()=='点夯'){
+
+        $("#select2").show();
+        $("#select3").show();
+        $("#label_2").show();
+           // alert($('#select1 option:selected').val())
+    }else if($('#select1 option:selected').text()=='强夯置换'){
+         $("#select2").show();
+         $("#select3").show();
+        $("#label_2").show();
+        
+    }else{
+        $("#select2").hide();
+    }
+
+    if ($('#select1 option:selected').text()=='满夯') {
+        $("#select3").hide();
+        $("#label_2").hide();
+    }
+
+}
+//  配置提交处理函数
+   function tijiao(){
+        if ($("#select1").val() !=3) {
+              var data = {
+                "hammer_type" : $("#select1").val(),
+                "points_arrangement" : $("#select2").val(),
+                "points_spac" :$("#select3").val(),
+                }
+        }else{
+             data = {
+                "hammer_type" : $("#select1").val(),
+            
+            };
+        }
+      
+        if(data.hammer_type=="0"){
+            alert("请选择夯击方式！");
+            return false;
+        }
+        if (data.hammer_type !=3) {
+            if(data.points_arrangement=="0"){
+                alert("请选择棑点形状！");
+                return false;
+            }
+        }
+      $('#peizhi').slideUp(200);
+      setconf(data.hammer_type);
+
+}
+//状态栏处理方式
+ function getDevStatus(){
+            $.post('?um=qh&ua=getDevStatus',{},function(data){
+        if (data.NET==1) {
+             $("#NET").show(); 
+        }
+
+        if (data.GNSS1==0) {
+            $("#gnss1_no").show();
+            $("#gnss1_yes").hide();
+            $("#gnss1_yes2").hide();
+            $("#gnss1_yes3").hide();
+            $("#gnss1_yes4").hide();
+        }else if(data.GNSS1==1){
+            $("#gnss1_yes").show();
+             $("#gnss1_no").hide();
+            $("#gnss1_yes2").hide();
+            $("#gnss1_yes3").hide();
+            $("#gnss1_yes4").hide()
+        }else if(data.GNSS1==2){
+             $("#gnss1_yes2").show();
+              $("#gnss1_yes").hide();
+            $("#gnss1_no").hide();
+            $("#gnss1_yes3").hide();
+            $("#gnss1_yes4").hide()
+        }else if(data.GNSS1==3){
+            $("#gnss1_yes3").show();
+             $("#gnss1_yes").hide();
+            $("#gnss1_yes2").hide();
+            $("#gnss1_no").hide();
+            $("#gnss1_yes4").hide()
+
+        }else if(data.GNSS1==4){
+            $("#gnss1_yes4").show();
+             $("#gnss1_yes").hide();
+            $("#gnss1_yes2").hide();
+            $("#gnss1_yes3").hide();
+            $("#gnss1_no").hide()   
+        }
+
+
+        if (data.GNSS2==0) {
+            $("#gnss2_no").show();
+            $("#gnss2_yes").hide();
+            $("#gnss2_yes2").hide();
+            $("#gnss2_yes3").hide();
+            $("#gnss2_yes4").hide()        
+        }else if(data.GNSS2==1){
+            $("#gnss2_yes").show();
+            $("#gnss2_no").hide();
+            $("#gnss2_yes2").hide();
+            $("#gnss2_yes3").hide();
+            $("#gnss2_yes4").hide()
+        }else if(data.GNSS2==2){
+            $("#gnss2_yes2").show();
+            $("#gnss2_yes").hide();
+            $("#gnss2_no").hide();
+            $("#gnss2_yes3").hide();
+            $("#gnss2_yes4").hide()
+        }else if(data.GNSS2==3){
+            $("#gnss2_yes3").show();
+            $("#gnss2_yes").hide();
+            $("#gnss2_yes2").hide();
+            $("#gnss2_no").hide();
+            $("#gnss2_yes4").hide()        
+        }else if(data.GNSS2==4){
+            $("#gnss2_yes4").show();
+            $("#gnss2_yes").hide();
+            $("#gnss2_yes2").hide();
+            $("#gnss2_yes3").hide();
+            $("#gnss2_no").hide()
+           
+        }
+
+        
+        if (data.CSQ==0) {
+            $("#CSQ").show();
+            $("#CSQ1").hide();
+            $("#CSQ2").hide();
+            $("#CSQ3").hide();
+            $("#CSQ4").hide();
+            $("#CSQ5").hide();
+        }else if (data.CSQ==1) {
+            $("#CSQ1").show();
+            $("#CSQ").hide();
+            $("#CSQ2").hide();
+            $("#CSQ3").hide();
+            $("#CSQ4").hide();
+            $("#CSQ5").hide();
+        }else if (data.CSQ==2) {
+            $("#CSQ2").show();
+            $("#CSQ1").hide();
+            $("#CSQ").hide();
+            $("#CSQ3").hide();
+            $("#CSQ4").hide();
+            $("#CSQ5").hide();
+        }else if (data.CSQ==3) {
+            $("#CSQ3").show();
+            $("#CSQ1").hide();
+            $("#CSQ2").hide();
+            $("#CSQ").hide();
+            $("#CSQ4").hide();
+            $("#CSQ5").hide();
+        }else if (data.CSQ==4) {
+            $("#CSQ4").show();
+            $("#CSQ1").hide();
+            $("#CSQ2").hide();
+            $("#CSQ3").hide();
+            $("#CSQ").hide();
+            $("#CSQ5").hide();
+        }else if (data.CSQ==5) {
+            $("#CSQ5").show();
+            $("#CSQ1").hide();
+            $("#CSQ2").hide();
+            $("#CSQ3").hide();
+            $("#CSQ").hide();
+            $("#CSQ4").hide();
+        }
+
+        });
+       }
+// 定时获取信号状态信息
+setInterval("getDevStatus()",5000)
+
+
+$(window).resize(function () {
+    left_adaptive();
+});
+// 查看历史纪录处理函数
+function loadhistory(){
+    $('#historylist').html('');
+    $.post("?um=qh&ua=get_history_data",{},function(data){
+        for(i in data)
+        {   
+            html = "<tr><td>"+data[i].id+"</td><td>"+data[i].count+"</td><td>"+data[i].costtime+"</td><td>"+data[i].cjsum+"</td><td>"+data[i].cjlast+"</td><td>"+data[i].cjlast2+"</td><td>"+data[i].ljavg+"</td><td class='ls'><div  style='width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid #000;float: right;margin-top: 6px;right:5px;margin-right: 30px;'></div></td></tr>";
+            
+            list = "<table class='tbls' style='width:100%;'><thead><tr><th>夯次</th><th>夯击时间</th><th>沉降量</th><th>落距</th></tr></thead>";
+            detail = data[i].detail;
+            for(j in detail)
+            {
+                hit_id = parseInt(j)+1;
+                list +="<tr><th>"+hit_id+"</th><th>"+detail[j].gpst+"</th><th>"+detail[j].chenjiang+"</th><th>"+detail[j].high+"</th></tr>";
+
+            }
+            list +='</table>';
+            html += "<tr class='li_s'><td colspan=8>"+list+"</td></tr>";
+            $('#historylist').append(html);
+        }
+    });
+
+}
+//  绑定展开单列点击事件
+    $(document).on('click','.ls',function(){
+        li_s = $(this).parent().next('tr').find('table');
+        // console.info($(this));
+        li_s.toggle();
+        console.info(li_s.html());
+    });
+// 左侧信息页面打开前运行方法，左侧信息根据页面大小确定显示尺寸
+function  left_adaptive()
+{
+    var w = $(".hammer").width();
+    var h = $(".hammer").height();
+    if (w>h) {
+      var k = Math.floor(divs(h,2));
+    }else{
+      var k = Math.floor(divs(w,2));
+    }
+   var f =  Math.floor(divs(k,22));
+   // $(".hammer-text").css({"font-size": f/2+"rem","line-height":f*10+"px"});
+    $(".hammer_number").css({"font-size": f*2+"rem"});
+    $(".hammer-text-average").css({"font-size": f*0.4+"rem","line-height":f*6+"px"});
+    $("#canvas").css({"width":$("#left").width(),"height":$("#left").width()});
+}
+
+// 重新布点
+function strat_over_point()
+{
+    if (!confirm('您确定要重新布点吗？')) {
+        return false;
+    }
+    // 保存排点信息
+    c.window.guide_len_data();
+    // window.location.reload();
+
+}
+
+// 验证传参数合法性
+function js_data_validation(key,errortext){
+    if (key == null||key == undefined) {
+        console.log(errortext);
+    }
+}  
+   
+function draw_point(canvasWidth, zoom, workAngle, lon, lat, lon1, lat1, type)
+{
+    js_data_validation(canvasWidth,"校准夯点功能获取画布尺寸失败！");
+    js_data_validation(zoom,"校准夯点功能获取画布比例尺失败！");
+    js_data_validation(workAngle,"车头相对于正北角度获取失败！");
+    js_data_validation(lon,"获取车的前天线经纬度失败！");
+    js_data_validation(lat,"获取车的前天线经纬度失败！");
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    if (type) {
+        // 验证数据
+        js_data_validation(lon1,"获取车的前天线最近的引导点经纬度失败！");
+        js_data_validation(lat1,"获取车的前天线最近的引导点经纬度失败！");
+        // var workAngle = chui_gps.workAngle; // 当前大臂指向
+        //var workAngle = Math.random() * 360;
+        //var fPoint = new GpsPoint(104.424947487, 30.298697222);     // 当前夯锤坐标
+        //var oPoint = new GpsPoint(104.42495601925, 30.298692063706);    // 预期夯点坐标
+        var fPoint = new GpsPoint(parseFloat(lon),parseFloat(lat));     // 当前夯锤坐标
+        var oPoint = new GpsPoint(parseFloat(lon1),parseFloat(lat1));    // 预期夯点坐标
+
+        var foDistance = fPoint.distance(oPoint);   // 当前夯锤到预期点的距离
+        var foNorthAngle = fPoint.getNorthAngle(oPoint);    // 当前夯锤到预期点的方向
+
+        var relativeAngle = foNorthAngle - workAngle;   // 夹角
+        if(relativeAngle < 0) relativeAngle += 360;
+        if(relativeAngle > 360) relativeAngle -= 360;
+        var foDistanceX = foDistance * Math.sin(GpsPoint.angleToRadia(relativeAngle));
+        var foDistanceY = foDistance * Math.cos(GpsPoint.angleToRadia(relativeAngle));
+
+        // 绘制背景
+        var myDate = new Date();
+        var h = myDate.getHours();       //获取当前小时数(0-23)
+        if (h>17||h<7) {
+            ctx.fillStyle = "#696969";
+        }else{
+            ctx.fillStyle = '#fff';
+        }
+    
+        ctx.fillRect(0, 0, 500, 500);  
+    }
+    
+
+    // 绘制外环
+    ctx.beginPath();
+    ctx.arc(canvasWidth / 2, canvasWidth / 2, canvasWidth / 2 - 10, 0, Math.PI * 2, true);
+    ctx.lineWidth = 1.0;
+    if (type) {
+        if (Math.abs(foDistanceX)<2&&Math.abs(foDistanceY)<2) {
+
+          if (Math.abs(foDistanceX)<0.5&&Math.abs(foDistanceY)<0.5) {      
+            ////console.log(Math.abs(foDistanceX));
+            ////console.log(Math.abs(foDistanceY));
+             ctx.strokeStyle = "#000";
+             ctx.fillStyle = "green";//填充颜色,默认是黑色 
+          }else{
+             ctx.strokeStyle = "#000";
+             ctx.fillStyle = "yellow";//填充颜色,默认是黑色
+            
+          } 
+           ctx.fill();//画实心圆
+        }else{
+            ctx.strokeStyle = "#000";
+            ctx.stroke();
+        }
+    }else{
+        ctx.strokeStyle = "#000";
+        ctx.stroke();
+    }
+    
+    ctx.closePath();  
+
+    // 绘制十字线
+    ctx.beginPath();
+    ctx.moveTo(canvasWidth / 2, 10);
+    ctx.lineTo(canvasWidth / 2, canvasWidth - 10);
+    ctx.moveTo(10, canvasWidth / 2);
+    ctx.lineTo(canvasWidth - 10, canvasWidth / 2);
+    ctx.lineWidth = 1.0; // 设置线宽
+    ctx.strokeStyle = '#666'; // 设置线的颜色
+    ctx.stroke();
+
+    // 绘制夯锤中心点
+    ctx.beginPath();
+    ctx.arc(canvasWidth / 2, canvasWidth / 2, 5, 0, Math.PI * 2, true); 
+    ctx.fillStyle = "#0000ff"; 
+    ctx.fill();
+
+    if (type) {
+        // 绘制预期点中心点
+        ctx.translate(foDistanceX * zoom, - foDistanceY * zoom);  // 画布偏移到预期点中心位置
+        ctx.beginPath();
+        ctx.arc(canvasWidth / 2, canvasWidth / 2, 5, 0, Math.PI * 2, true);
+        ctx.fillStyle = "#ff0000";
+        ctx.fill();
+        ctx.translate(- foDistanceX * zoom, foDistanceY * zoom);  // 还原画布的偏移量
+
+        // 绘制箭头
+        var arrowMinSize = 100;  // 箭头最短尺寸
+
+        // 绘制横向箭头， 指示X偏移量
+        var arrowXSize = Math.max(arrowMinSize, Math.abs(foDistanceX) * zoom) - 10; // 箭头实际绘制尺寸
+        // log("arrowXSize: " + arrowXSize);
+        var arrowXStartX = canvasWidth / 2 + 10;
+        var arrowXStartY = canvasWidth / 2 + 10;
+        var arrowXEndX = arrowXStartX + arrowXSize;
+        var arrowXEndY = arrowXStartY;
+
+        if(relativeAngle > 180)
+        {
+            arrowXStartX = canvasWidth / 2 - 10;
+            arrowXEndX = arrowXStartX - arrowXSize;
+        }
+
+        if(relativeAngle > 90 && relativeAngle < 270)
+        {
+            arrowXStartY = canvasWidth / 2 - 10;
+            arrowXEndY = arrowXStartY;
+        }
+
+        // log("arrowX: " + arrowXStartX + ", " + arrowXStartY + " -> " + arrowXEndX + ", " + arrowXEndY);
+
+        ctx.beginPath();
+        ctx.moveTo(arrowXStartX, arrowXStartY);
+        ctx.lineTo(arrowXEndX, arrowXEndY);
+        ctx.lineWidth = 3.0; // 设置线宽
+        ctx.strokeStyle = '#f00'; // 设置线的颜色
+        ctx.fill();  
+        ctx.stroke();   
+        ctx.save(); 
+
+        //画箭头
+        ctx.translate(arrowXEndX,arrowXEndY);  
+        //我的箭头本垂直向下，算出直线偏离Y的角，然后旋转 ,rotate是顺时针旋转的，所以加个负号  
+        var ang=(arrowXEndX-arrowXStartX)/(arrowXEndY-arrowXStartY);  
+        ang=Math.atan(ang);  
+        if(arrowXEndY-arrowXStartY >= 0){  
+        ctx.rotate(-ang);  
+        }else{  
+        ctx.rotate(Math.PI-ang);//加个180度，反过来  
+        }   
+         
+        ctx.lineTo(-5,-10);   
+        ctx.lineTo(0,-5);   
+        ctx.lineTo(5,-10);   
+        ctx.lineTo(0,0);
+
+        ctx.fill(); //箭头是个封闭图形 
+        ctx.restore();   //恢复到堆的上一个状态，其实这里没什么用。
+
+        // 表明尺寸
+        //设置字体样式
+        ctx.font = "Bold 25px Arial";
+        //设置字体填充颜色
+        ctx.fillStyle = "red";
+        //从坐标点(50,50)开始绘制文字
+        if (foDistanceX>0) {
+            textX = canvasWidth / 2 + 50;
+
+        }else{
+            textX = canvasWidth / 2 - 80;
+            //console.log("canvasWidth:"+canvasWidth);
+            //console.log("textX:"+textX);
+        }
+        ctx.fillText(Math.abs(foDistanceX.toFixed(2))+"m", textX,arrowXEndY - 10);  
+        ctx.closePath();   
+        
+        // 绘制纵向箭头， 指示Y偏移量
+        var arrowYSize = Math.max(arrowMinSize, Math.abs(foDistanceY) * zoom) - 10; // 箭头实际绘制尺寸
+        // log("arrowYSize: " + arrowYSize);
+        var arrowYStartX = canvasWidth / 2 - 10;
+        var arrowYStartY = canvasWidth / 2 - 10;
+        var arrowYEndX = arrowYStartX;
+        var arrowYEndY = arrowYStartY - arrowYSize;
+       
+        if(relativeAngle > 180)
+        {
+            arrowYStartX = canvasWidth / 2 + 10;
+            arrowYEndX = arrowYStartX;
+        }
+
+        if(relativeAngle > 90 && relativeAngle < 270)
+        {
+            arrowYStartY = canvasWidth / 2 + 10;
+            arrowYEndY = canvasWidth / 2 + 10 + arrowYSize;
+        }
+        // log("arrowY: " + arrowYStartX + ", " + arrowYStartY + " -> " + arrowYEndX + ", " + arrowYEndY);
+
+        ctx.beginPath();
+        ctx.moveTo(arrowYStartX, arrowYStartY);
+        ctx.lineTo(arrowYEndX, arrowYEndY);
+        ctx.lineWidth = 3.0; // 设置线宽
+        ctx.strokeStyle = '#f66'; // 设置线的颜色
+        ctx.fill();  
+        ctx.stroke();   
+        ctx.save(); 
+
+        //画箭头
+        ctx.translate(arrowYEndX,arrowYEndY);  
+        //我的箭头本垂直向下，算出直线偏离Y的角，然后旋转 ,rotate是顺时针旋转的，所以加个负号  
+        var ang=(arrowYEndX-arrowYStartX)/(arrowYEndY-arrowYStartY);  
+        ang=Math.atan(ang);  
+        if(arrowYEndY-arrowYStartY >= 0){  
+        ctx.rotate(-ang);  
+        }else{  
+        ctx.rotate(Math.PI-ang);//加个180度，反过来  
+        }   
+         
+        ctx.lineTo(-5,-10);   
+        ctx.lineTo(0,-5);   
+        ctx.lineTo(5,-10);   
+        ctx.lineTo(0,0);
+
+        ctx.fill(); //箭头是个封闭图形 
+        ctx.restore();   //恢复到堆的上一个状态，其实这里没什么用。
+
+        // 表明尺寸
+        //设置字体样式
+        ctx.font = "Bold 25px Arial";
+        //设置字体填充颜色
+        ctx.fillStyle = "red";
+        //从坐标点(50,50)开始绘制文字
+        if (foDistanceY>0) {
+            textY = canvasWidth / 2 - 35;
+        }else{
+            textY = canvasWidth / 2 + 50;
+        }
+        ctx.fillText(Math.abs(foDistanceY.toFixed(2))+"m", arrowYEndX+5,textY);
+        ctx.closePath();
+    }
+}
+
+    function add(a,b){
+     suma=a+b;
+     return suma;
+     }
+     function sum(a,b){
+     sumb=a-b;
+     return sumb;
+     }
+     function app(a,b){
+     sumc=a*b;
+     return sumc;
+     }
+     function divs(a,b){
+     sumd=a/b;
+     return sumd;
+     }
+ 
+    function zoomin() {
+        c.window.draw.zoomBo(true); 
+    }
+    
+    function zoomout() {
+        c.window.draw.zoomBo(false); 
+    }
+
+    // 锤子动画
+    function hammer_high(){
+     
+        var high = parseFloat($('#hammer_high').html());
+        if (high <= 0)
+        {
+            $('#imgChuizi').stop().animate({top:0}, 1000);
+        }
+        else
+        {
+            var highTop = high / 20 * -100;
+            if (highTop < -80)
+            {
+                highTop = -80;
+            }
+            $('#imgChuizi').stop().animate({top:''+highTop+'%'}, 1000);
+        }
+    }
+ 
+
+
+function test()
+    {
+  left_adaptive();
+  var myDate = new Date();
+  var h = myDate.getHours();       //获取当前小时数(0-23)
+  if (h>17||h<7) {
+    $("#content").css({"background-color": "#696969","color":"#CFCFCF"});
+    $("#peizhi").css({"background-color": "#696969","color":"#CFCFCF"});
+    $("#yincang").css({"background-color": "#696969","color":"#CFCFCF"});
+    $("#myModal").css({"background-color": "#696969","color":"#CFCFCF"});
+    }
+
+}test();
+
+
+// console.log($("#setdataid").val());   
+$(function(){
+    console.log(window.location.hash);
+   //    console.log(window.location.hash); 
+
+    if (window.location.hash == "") {
+        console.log('show yincang');
+        $("#yincang").show()
+        var hammer_type = $('input:radio[name="hammer_type"]:checked').val();
+        if (hammer_type!=3) {
+            $("#paidianxingzhuang").show();
+        }
+    }else{    
+        $("#yincang").hide();
+         document.getElementById('audio').pause();
+    }
+
+    setreload();    
+});
+
+// 定时刷新
+function  setreload() {
+    var id = window.setInterval(function(){
+            if(parent.location.hash != "#reload") parent.location.href += '#reload';
+            parent.location.reload();
+    }, 120000);
+}
+</script>
+</html> 

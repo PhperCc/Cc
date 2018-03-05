@@ -1,0 +1,113 @@
+<ul class="breadcrumb">
+	<li><a href="./">主页</a> <span class="divider">/</span></li>
+	<li class="active"> { $title } </li>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <div class="btn-group">
+        <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">文档快速导航 <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+        { foreach from=$handler_list item=handler key=handler_name }
+            <li class="dropdown-submenu">
+                <a href="#handler_{ $handler_name }">{ $handler_name }<br />{ $handler.desc }</a>
+                <ul class="dropdown-menu bs-docs-sidenav">
+                { foreach from=$handler.methods item=method key=method_name }
+                    <li><a href="#method_{ $handler_name }_{ $method_name }">{ $method.sign }<br />{ $method.desc }</a></li>
+                { /foreach }
+                </ul>
+            </li>
+        { /foreach }
+        </ul>
+    </div>
+</ul>
+
+<section>
+    <a name="summary"></a>
+    <div class="page-header"><h2>概述</h2></div>
+    <h4>接口地址</h4>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr><th style="width:150px;">协议类型</th><th>接口地址</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>HTTP</td><td>http://<span class="host"></span>:1226/?req=</td></tr>
+            <tr><td>Websocket</td><td>websocket://<span class="host"></span>:1228</td></tr>
+        </tbody>
+    </table>
+
+    <h4>协议格式</h4>
+    <table class="table table-bordered table-hover">
+        <tbody>
+            <tr>
+                <td colspan="2">
+                    <p>1. 协议的调用方式为 请求 / 返回 的问答式交互， 协议的正常交互内容为基于标准 JSON 格式组织的文本内容</p>
+                    <p>2. 当请求指令格式不正确时， 服务端将返回异常信息</p>
+                    <p>3. 基于 HTTP 协议的 API 调用， 将请求指令使用 GET 方式提交， 请求指令的键名为 <b>req</b></p>
+                    <p>4. 基于 Websocket 协议的 API 调用， 直接 Send / Recive 交互。</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:150px;">请求指令格式</td>
+                <td>
+<pre>
+{
+    "seq":1482852377,           // 请求指令的序列号， 值必须为大于0的正整数， 由api调用方自行维护。
+    "action":"Endpoint.add",    // 请求所调用的api方法
+    "params":{                  // 请求所调用的api方法参数， 参数名由具体方法定义
+        "uid":"endpoint_uid"
+    }
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>返回指令格式</td>
+                <td>
+<pre>
+{
+    "seq":1482852377,       // 请求指令的序列号， 原样返回调用方
+    "result":true,          // api方法执行结果， true 为成功， false为失败。
+    "info":"",              // api方法执行返回的文本消息， 参数值及意义由具体方法定义
+    "data":null             // api方法执行返回的数据内容， 参数值及意义由具体方法定义
+}
+</pre>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+{ foreach from=$handler_list item=handler key=handler_name }
+<a name="handler_{ $handler_name }"></a>
+<section>
+    <div class="page-header"><h2>{ $handler_name }: { $handler.desc }</h2></div>
+    { foreach from=$handler.methods item=method key=method_name }
+    <a name="method_{ $handler_name }_{ $method_name }"></a>
+    <h4>{ $method.desc }</h4>
+    <i>{ $method.sign }</i> <a target="_blank" href="./?um=apitest&api={ $handler_name }&method={ $method_name }">点击测试</a>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr><th style="width:150px;">参数</th><th style="width:50px;">可省略</th><th style="width:100px;">类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            { foreach from=$method.params item=param key=param_name }
+            <tr>
+                <td>{ $param_name }</td>
+                <td style="text-align:center;">{ if $param.omitable eq 1 }是{ /if }</td>
+                <td>{ $param.type }</td>
+                <td>{ $param.desc }</td>
+            </tr>
+            { /foreach }
+            { foreach from=$method.returns item=return key=return_name }
+            <tr><td><b class="text-error">return</b> { $return_name }</td><td></td><td>{ $return.type }</td><td>{ $return.desc }</td></tr>
+            { /foreach }
+            <tr><td><b>调用示例:</b></td><td colspan="3"><pre>{ $method.example }</pre></td></tr>
+        </tbody>
+    </table>
+    { /foreach }
+</section>
+{ /foreach }
+
+<script type="text/javascript">
+$(function(){
+    $('.host').html(window.location.host);
+});
+</script>

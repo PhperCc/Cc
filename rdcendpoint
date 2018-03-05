@@ -1,0 +1,43 @@
+# Default server configuration
+#
+server {
+	listen 80 default_server;
+	root /home/system/rdcos/Web;
+	index index.php index.html index.htm;
+
+	server_name _;
+
+    rewrite ^/(\w+)$               /index.php?um=$1&ua=index    last;
+    rewrite ^/(\w+)\.\.(\w+)$      /index.php?um=$1&ua=$2       last;
+
+	#location / {
+	#	# First attempt to serve request as file, then
+	#	# as directory, then fall back to displaying a 404.
+	#	try_files $uri $uri/ =404;
+	#}
+
+	# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+	location ~ \.php$ {
+	#	include snippets/fastcgi-php.conf;
+	
+	#	# With php7.0-cgi alone:
+	#	fastcgi_pass 127.0.0.1:9000;
+	#	# With php7.0-fpm:
+	#	fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+    #    root           html;
+        #root /home/system/rdc/web;
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+
+	}
+
+	# deny access to .htaccess files, if Apache's document root
+	# concurs with nginx's one
+	#
+	location ~ /\.ht {
+		deny all;
+	}
+}
+

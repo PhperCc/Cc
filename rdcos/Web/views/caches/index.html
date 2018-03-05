@@ -1,0 +1,87 @@
+<legend>
+    <button type="button" class="btn btn-primary" id="btnPause"><i class="icon-pause icon-white"></i> 暂停</button>
+    <button type="button" class="btn btn-primary" id="btnPlay" style="display:none;"><i class="icon-play icon-white"></i> 监控</button>
+</legend>
+<form class="form-horizontal" onsubmit="return false;">
+<table class="table table-bordered table-hover" id="cache_list">
+    <tr>
+        <th>键名</th>
+        <th colspan="2">值</th>
+    </tr>
+</table>
+</form>
+
+<style type="text/css">
+.led{margin-right:5px;}
+.table-bordered .remove_key{width: 26px;border-left:0;color: #fff;cursor: pointer;}
+.remove_key:hover{color:#f00;}
+</style>
+<script type="text/javascript" src='./public/js/ServiceApi.js'></script>
+<script type="text/javascript">
+var play_status = true;
+$(function(){
+    $('#btnPause').click(function(){
+        play_status = false;
+
+        $('#btnPause').hide();
+        $('#btnPlay').show();
+    });
+
+    $('#btnPlay').click(function(){
+        play_status = true;
+
+        $('#btnPlay').hide();
+        $('#btnPause').show();
+    });
+    $("body").on('click','.remove_key',function(){
+        var keystr = $(this).prev().prev().text();
+        $(this).parent().remove();
+        $.ajax({
+           type: "POST",
+           url: "./caches..delete_key",
+           dataType: "json",
+           data: "key="+keystr,
+           success: function(msg){
+             console.log(msg);
+           }
+        });  
+    })
+});
+
+
+ServiceApi.request("Cache.keys", {}, function($reqSeq, $result, $info, $keys)
+{
+    if(!$result) return;
+    if(!play_status) return;
+    for(var $i = 0; $i < $keys.length; $i++)
+    {
+        var $key = $keys[$i];
+        var $validKey = validKey($key);
+        var $row = $('#cache_' + $validKey);
+	
+        if($row.length == 0)
+        {
+	if($key.split(':')[0] == 'enhtoken') continue;
+            var time = ($key.split(':')[0] == 'Sensor')?300:3000;
+            ServiceApi.request("Cache.get", {'key': $key}, function($reqSeq, $result, $info, $val){
+                if(!$result) return;
+                if(!play_status) return;
+                var $valHtml = JSON.stringify($val);
+                var validKey = $info.replace(/[^\w]/g, "__");
+                $('#cache_val_' + validKey).html($valHtml);
+            },time);
+
+            var $line_html = '<tr class="cache" key="' + $validKey + '" id="cache_' + $validKey + '">';
+            $line_html += '<td class="key" id="cache_key_' + $validKey + '">' + $key + '</td>';
+            $line_html += '<td class="val" id="cache_val_' + $validKey + '" key="' + $key + '"><span class="remove_key">删除</span></td><td class="remove_key">删除</td>';
+            $line_html += '</tr>';
+            $('#cache_list').append($line_html);
+        }
+    }
+}, 1000);
+
+function validKey($key)
+{
+    return $key.replace(/[^\w]/g, "__");
+}
+</script>

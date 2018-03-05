@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="renderer" content="webkit">
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=0.7, maximum-scale=0.7">
+	<title>GPS绘图</title>
+	<link rel="stylesheet" href="/css/draw.css">
+	<link rel="stylesheet" href="/css/font-awesome.min.css">
+	<style>
+		/* 控制页面样式 */
+		.btn,
+		.btn:visited {
+			background: linear-gradient(to bottom, #000 0%, #666 80%) #222;
+			display: inline-block;
+			padding: 7px 10px;
+			color: #fff;
+			text-decoration: none;
+			border-radius: 5px;
+			border: 0;
+			position: relative;
+			cursor: pointer;
+			letter-spacing: 2px;
+			margin-top: 5px;
+			box-shadow: 0 0 3px #fff;
+			opacity: 0.9;
+			font-size: 12px;
+			text-align: center;
+			outline: 0;
+		}
+
+		.btn:hover {
+			opacity: 1;
+		}
+
+		.btn:active {
+			top: 1px;
+		}
+
+		.green.btn,
+		.green.btn:visited {
+			background: linear-gradient(to bottom, #009900 0%, #00CC00 80%) #009900;
+		}
+
+		.red.btn,
+		.red.btn:visited {
+			background: linear-gradient(to bottom, #990000 0%, #FF3333 80%) #990000;
+		}
+
+		.blue.btn,
+		.blue.btn:visited {
+			background: linear-gradient(to bottom, #003399 0%, #0066FF 80%) #003399;
+		}
+
+		.yellow.btn,
+		.yellow.btn:visited {
+			background: linear-gradient(to bottom, #CC6600 0%, #FF9900 80%) #CC6600;
+		}
+
+		#divDrawType ul {
+			padding: 0;
+			margin: 0;
+			width: 80px;
+			border-radius: 5px;
+			overflow: hidden;
+			line-height: 2;
+			letter-spacing: 1px;
+			border: solid 5px rgba(125, 125, 125, 0.5);
+			box-shadow: 0 0 5px #fff;
+		}
+
+		#divDrawType ul li {
+			display: block;
+			text-align: center;
+			font-size: 14px;
+			cursor: pointer;
+			background: #000;
+			color: #ddd;
+			border-top: solid 1px #999;
+			background: linear-gradient(to bottom, #000 0%, #666 80%) #222;
+		}
+
+		#divDrawType ul li:first-child {
+			border-top: 0;
+		}
+
+		#divDrawType ul li.active {
+			background: linear-gradient(to bottom, #006600 0%, #009900 80%) #006600;
+			color: #fff;
+		}
+	</style>
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/hammer.min.js"></script>
+	<script src="/js/draw.js"></script>
+	<script src="/js/draw_data.js"></script>
+</head>
+<body>
+	<div id="divMain"></div>
+	<div class="tool" style="bottom:10px; right:10px;">
+		<button class="btn blue" onclick="draw.resetDraw();"><i class="fa fa-refresh fa-fw"></i> 刷新</button><br>
+		<button class="btn blue" onclick="draw.zoom(true);"><i class="fa fa-search-plus fa-fw"></i> 放大</button><br>
+		<button class="btn blue" onclick="draw.zoom(false);"><i class="fa fa-search-minus fa-fw"></i> 缩小</button><br>
+		<button class="btn yellow" onclick="draw.setConfig({backgroundColor:'#000', textColor:'#fff'});"><i class="fa fa fa-circle fa-fw"></i> 黑色</button><br>
+		<button class="btn yellow" onclick="draw.setConfig({backgroundColor:'#fff', textColor:'#000'});"><i class="fa fa fa-circle-o fa-fw"></i> 白色</button><br>
+	</div>
+	<div id="divDrawType" class="tool" style="top:10px; right:10px;">
+		<ul>
+			<li data-value="0"><i class="fa fa-random fa-fw"></i> 轨迹</li>
+			<li data-value="1" class="active"><i class="fa fa-google-wallet fa-fw"></i> 路径</li>
+			<li data-value="2"><i class="fa fa-outdent fa-fw"></i> 速度</li>
+			<li data-value="3"><i class="fa fa-align-center fa-fw"></i> 遍数</li>
+		</ul>
+	</div>
+
+	<script>
+	var gpsId = 1;
+	var option = {
+		isDebug: false,
+		zoomRate: 20,
+		clickFn: function (p, gps, m) {
+			var gps1 = {
+				lon: GpsDrawData.carList[0].lon,
+				lat: GpsDrawData.carList[0].lat,
+			};
+			var deg = GpsTool.getGpsAngle(gps1, gps);
+			var car = {
+				no: 'RL0101',
+				lon: gps.lon,
+				lat: gps.lat,
+				deg: deg,
+				gpsList: [{lon: 10, lat: 10}],
+			};
+
+			GpsDrawData.carUpdate([car]);
+
+			draw.drawCar(true);
+
+			GpsDrawData.appendGpsList([{
+				id: gpsId,
+				car_no: 'RL0101',
+				lon: gps.lon,
+				lat: gps.lat,
+				last_id: gpsId - 1,
+				deg: deg,
+				data: [Math.random() * 10, Math.random() * 200],
+			}]);
+			gpsId++;
+
+			draw.resetGpsDraw();
+		},
+		loadSyncFn1: function () {
+			var res = $.ajax({
+				url: 'draw..get_data',
+				type: 'POST',
+				data: {
+					lon1: GpsTool.gpsMin.lon,
+					lat1: GpsTool.gpsMin.lat,
+					lon2: GpsTool.gpsMax.lon,
+					lat2: GpsTool.gpsMax.lat,
+				},
+				dataType: 'json',
+				async: false,
+			}).responseText;
+			var data = JSON.parse(res);
+			if (data.result == 1) {
+				setData();
+				GpsDrawData.carGpsList = data.data;
+			}
+		},
+		loadAsynFn2: function () {
+			console.time('load');
+			var res = $.ajax({
+				url: 'draw..get_data',
+				type: 'POST',
+				data: {
+					lon1: GpsTool.gpsMin.lon,
+					lat1: GpsTool.gpsMin.lat,
+					lon2: GpsTool.gpsMax.lon,
+					lat2: GpsTool.gpsMax.lat,
+				},
+				dataType: 'json',
+				success: function (res) {
+					if (res.result == 1) {
+						setData();
+						GpsDrawData.carGpsList = res.data;
+						draw.loadAsynFinish();
+					}
+					else {
+						draw.loadAsynFinish();
+						console.error(res);
+					}
+				},
+				error: function (xh, err) {
+					draw.loadAsynFinish();
+					console.error(err);
+				}
+			});
+		}
+	};
+	var draw = new Draw('divMain', 103.9471028617, 35.1965391167, option);
+	//var draw = new Draw('divMain', 104.4358262800, 30.3235612967, option);
+	function setData() {
+
+		GpsDrawData.draw = draw;
+		//GpsDrawData.trackCarNo = 'RLGSLW0103';
+		GpsDrawData.trackType = 'view';
+		GpsDrawData.drawType = parseInt($('#divDrawType .active').data('value'));
+		GpsDrawData.dataIndex = 0;
+		GpsDrawData.dataColorRange = [
+			new ColorRange(0, 1, new ColorRgb(0, 0, 255), new ColorRgb(155, 155, 255)),
+			new ColorRange(1, 2, new ColorRgb(0, 155, 0), new ColorRgb(0, 255, 0)),
+			new ColorRange(2, 2, new ColorRgb(255, 155, 155), new ColorRgb(255, 0, 0)),
+		];
+		var gps = {lon: 108, lat: 34};
+		GpsDrawData.bottomShapeList.push([ShapeType.circle, {gps: gps}]);
+		gps = GpsTool.gpsGoAngle(gps, 45, 20);
+		GpsDrawData.bottomShapeList.push([ShapeType.circle, {gps: gps}]);
+		GpsDrawData.bottomShapeList.push([ShapeType.area, {
+			gps_list: [
+				{lon: 107.9963165, lat: 34.00422979},
+				{lon: 107.99943227, lat: 34.00444579},
+				{lon: 108.00088702, lat: 34.00197979},
+				{lon: 107.99878089, lat: 34.00109779},
+				{lon: 107.99536114, lat: 34.00142179},
+			], width: 1
+		}]);
+
+		GpsDrawData.carUpdate([{
+			no: 'RL0101',
+			imgWidth: 100,
+			imgHeight: 237,
+			carWidth: 2,
+			carHeight: 4,
+			lon: 108,
+			lat: 34,
+			deg: 0,
+			info: '1.3km/h 120℃',
+			updateTime: new Date().getTime(),
+			img: '/img/car_roller.png',
+			name: '双钢轮压路机01',
+		}, {
+			no: 'RLCDTFJC0105',
+			imgWidth: 100,
+			imgHeight: 237,
+			carWidth: 2.3,
+			carHeight: 4,
+			lon: 108.0001,
+			lat: 34,
+			deg: 145,
+			info: '1.3km/h 120℃',
+			updateTime: new Date().getTime(),
+			img: '/img/car_roller.png',
+			name: '双钢轮压路机02',
+			isOnline: true,
+		}, {
+			no: 'RLGSLW0103',
+			imgWidth: 100,
+			imgHeight: 237,
+			carWidth: 2.3,
+			carHeight: 4,
+			lon: 108.0001,
+			lat: 34,
+			deg: 145,
+			info: '1.3km/h 120℃',
+			updateTime: new Date().getTime(),
+			img: '/img/car_roller.png',
+			name: '双钢轮压路机02',
+			isOnline: true,
+		}, {
+			no: 'PV0101',
+			imgWidth: 500,
+			imgHeight: 600,
+			carWidth: 10,
+			carHeight: 4,
+			lon: 108.0002,
+			lat: 34,
+			deg: 80,
+			info: ' ',
+			updateTime: new Date().getTime(),
+			img: '/img/car_paver.png',
+			name: '摊铺机01',
+			isOnline: true,
+			isPaver: true,
+		}]);
+
+		//GpsDrawData.carGpsList = gpsList;
+
+		//draw.resetDraw();
+		//autoRun();
+	};
+
+	var gpsIndex = 0;
+	function autoRun() {
+		window.setInterval(function () {
+			var r = gpsList[gpsIndex];
+			gpsIndex++;
+			if (gpsIndex >= gpsList.length) {
+				return;
+			}
+			GpsDrawData.appendGpsList([r]);
+			GpsDrawData.carUpdate([{
+				no: r.car_no,
+				lon: r.lon,
+				lat: r.lat,
+				deg: r.deg,
+				info: Tool.round(r.data[0], 2) + 'km/h ' + Tool.round(r.data[1]) + '℃',
+				isOnline: true,
+			}]);
+		}, 100);
+	}
+
+	$(function () {
+		$('#divDrawType li').click(function () {
+			GpsDrawData.drawType = parseInt($(this).data('value'));
+			draw.resetDraw();
+			$('#divDrawType li').removeClass('active');
+			$(this).addClass('active');
+		});
+		
+		setData();
+	});
+	</script>
+
+</body>
+
+</html>

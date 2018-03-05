@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>设备尺寸</title>
+    <link rel="stylesheet" href="./css/main.css" type="text/css" media="screen">
+    <!-- Color Scheme -->
+    <link rel="stylesheet" href="./css/color.css" type="text/css" media="screen">
+    <link href="./css/layout.css" rel="stylesheet">
+</head>
+<body>
+    <div id="st-container" class="st-container">
+        <nav class="st-menu st-effect-4">
+            <ul>
+                <li><h1>ENH</h1></li>
+              <li><a class="ico home selected" href="?um=qh&ua=work">工作现场</a></li>
+              <li><a class="ico services" href="?um=qh&ua=calibration">设备校准</a></li>
+              <li><a class="ico gallery" href="?um=qh&ua=conf">基本设置</a></li>
+              <li><a class="ico portfolio" href="?um=qh&ua=hammer">设备参数</a></li>
+          </ul>
+        </nav>
+        <div class="st-pusher">
+            <div class="st-content">
+                <div class="st-content-inner">
+                <!-- Top Navigation -->
+                <header>
+                    <div id="st-trigger-effects">
+                        <button data-effect="st-effect-4" id="menu-bars"></button>
+                    </div>
+                    <h1>设备参数</h1>
+                </header>
+                <div class="content">
+                    <div class="dcm-left">
+                        <div class="divimg">
+                            <img  src="./img/xiaozhun1.png"  alt=""  width="100%" id="tianxian" >
+                            <img  src="./img/tianxianX2.png" alt=""  width="100%" id="tianxian1" class="div-img"  ><img  src="./img/tianxianY2.png" alt=""  width="100%" id="tianxian2" class="div-img" >
+                            <img  src="./img/tianxianX1.png" alt=""  width="100%" id="tianxian4" class="div-img" >
+                            <img  src="./img/tianxiany1.png"  alt="" width="100%"  id="tianxian5" class="div-img" >
+                            
+                            <img  src="./img/xiaozhunH1.png" alt=""   width="100%" id="tianxian6" class="div-img" >
+                        </div>
+                        <div class="divimg" style="display: none;">
+                            <img  src="./img/xiaozhun.png"  alt=""  width="100%">
+                        </div>
+                    </div>
+                    <div class="dcm-right">
+<fieldset class="text-center">
+    <legend align="center">夯击参数设置</legend>
+    <div id="signinform" class="check_form">
+        <div class="setting_list">
+            <label>最小高度</label>
+            <input type="text" placeholder="最小高度" id="high_min" value="{ $QHconfig.high_min }" />
+            <span class="unit">米</span>
+        </div>
+        <p class="prompts">最小高度</p>
+        <div class="setting_list">
+            <label>换坑间距</label>
+            <input type="text" placeholder="换坑间距" id="gps_dist_min" value="{ $QHconfig.gps_dist_min }"  / >
+            <span class="unit">米</span>
+        </div>
+        <div class="setting_list">
+            <label>夯点间距</label>
+            <input type="text" placeholder="夯点间距" id="points_spac" value="{ $QHconfig.points_spac }"  / >
+            <span class="unit">米</span>
+        </div>
+        <p class="prompts">夯间距</p>
+
+        <div class="setting_list">
+            <label>编码器一圈距离</label>
+              <input type="text" placeholder="编码器一圈距离" id="dist_rate" value="{ $QHconfig.dist_rate }" />
+            <span class="unit">米</span>
+        </div>
+        <p class="prompts">编码器一圈距离</p>
+        <div class="setting_list">
+            <label>最小波动阀值</label>
+            <input type="text" placeholder="编码器一圈距离" id="same_high_min" value="{ $QHconfig.same_high_min }" />
+            <span class="unit">米</span>
+        </div>
+        <p class="prompts">最小波动阀值</p>
+
+        <div class="setting_list">
+            <label>夯捶半径</label>
+            <input type="text" placeholder="夯捶半径" id="radius" value="{ $QHconfig.radius }" />
+            <span class="unit">米</span>
+        </div>
+         <div class="setting_list" id="aspect">
+            <label>编码器正转方向</label>
+             <div style="width: 100px;float: left; margin-top: 15px;">
+                <input type="radio" placeholder="编码器转向" id="numkeyboard2" name="aspect"  value="1" style="width: 10%;" { if $QHconfig.aspect == "1" } checked="checked" { /if } /><span>顺时针</span>
+            </div>
+            <div style="width: 100px;float: left; margin-top: 15px;">
+                 <input type="radio" placeholder="编码器转向" id="numkeyboard2" name="aspect"  value="0" style="width: 10%;" { if $QHconfig.aspect == "0" } checked="checked" { /if } /><span>逆时针</span>
+            </div>
+        </div>
+          <div class="setting_list" id="points_arrangement">
+
+            <label>排点形状</label>
+            <div style="width: 100px;float: left; margin-top: 15px;">
+                <input type="radio" placeholder="排点形状" id="numkeyboard2" name="points_arrangement"  value="1" { if $QHconfig.points_arrangement == "1" } checked="checked" { /if } style="width: 10%;" /><span>正方形</span>
+            </div>
+            <div style="width: 100px;float: left; margin-top: 15px;">
+                 <input type="radio" placeholder="排点形状" id="numkeyboard2" name="points_arrangement"  value="2" style="width: 10%;" { if $QHconfig.points_arrangement == "2" } checked="checked" { /if }/><span>正三角形</span>
+            </div>
+        </div>
+          <div class="setting_list" id="car_type">
+            <label>夯机类型</label>
+             <div style="width: 100px;float: left; margin-top: 15px;">
+                <input type="radio" placeholder="夯机类型" id="numkeyboard2" name="car_type"  value="1" checked="checked" style="width: 10%;" { if $QHconfig.car_type == "1" } checked="checked" { /if }/><span>不带龙门架</span>
+            </div>
+            <div style="width: 100px;float: left; margin-top: 15px;">
+                 <input type="radio" placeholder="夯机类型" id="numkeyboard2" name="car_type"  value="2" style="width: 10%;" { if $QHconfig.car_type == "2" } checked="checked" { /if }/><span>带龙门架</span>
+            </div>
+        </div>
+        <p></p> 
+        <p></p>
+        <p></p>
+         <p class="prompts">夯捶半径</p>
+        <button id="button_rth">提交保存并应用</button>
+    </div>
+</fieldset>
+                        </br>
+                        </br>
+                        </br>
+                    </div>
+                </div>
+                </div><!-- /st-content-inner -->
+            </div><!-- /st-content -->
+        </div><!-- /st-pusher -->
+    </div><!-- /st-container -->
+<script src="./js/jquery.min.js"></script>
+<script src="./js/classie.js"></script>
+<script src="./js/sidebarEffects.js"></script>
+<script>
+var url = "?um=qh&ua=conf";
+$("#button_rth").click(function(){
+    data = {
+    "high_min" : $("#high_min").val(),
+    "gps_dist_min" : $("#gps_dist_min").val(),
+    "points_spac" : $("#points_spac").val(),
+    "dist_rate" : $("#dist_rate").val(),
+    "same_high_min" : $("#same_high_min").val(),
+    "radius" : $("#radius").val(),
+    "aspect" : $("#aspect input:checked").val(),
+    "points_arrangement" : $("#points_arrangement input:checked").val(),
+    "car_type" : $("#car_type input:checked").val(),
+    }
+    confsave(data);
+});
+function confsave(data)
+{   
+    $.post(url,data,function(data){
+        if(data == 1) location.reload();
+        console.log(data);
+    });
+}
+</script>
+</body>
+
+</html>

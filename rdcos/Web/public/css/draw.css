@@ -1,0 +1,148 @@
+/*!
+ * DRAW绘图 CSS 样式表
+ * zjf @ 2017-02-17
+ */
+
+html,
+body {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+#divMain {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+#divCanvasList {
+	position: absolute; top:0; left:0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+.canvas{
+	position: absolute; top:0; left:0;
+    image-rendering: optimizeQuality;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+.tool{
+	position: absolute;
+}
+
+#divCar{
+	position: absolute; top:0; left:0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	pointer-events:none;
+	color:black;
+}
+
+#divCar .car{
+	position: absolute;
+}
+
+#divCar .car img{
+	position: absolute;
+	width:100%;
+	height:100%;
+}
+#divCar .car span{
+	position: absolute;
+	text-align: center;
+	line-height: 1.2;
+	font-size:12px;
+	font-family: Arial, Helvetica, sans-serif;
+	text-shadow: #fff 1px 0 0,#fff 0 1px 0,#fff -1px 0 0,#fff 0 -1px 0;
+}
+#divCar .car b{
+	letter-spacing:1px;
+}
+#divCar .online{
+	color:green;
+}
+
+#divRule{
+	position: absolute; bottom:25px; left:5px;
+	text-align: center;
+	border-bottom:solid 2px gray;
+	border-left:solid 1px gray;
+	border-right:solid 1px gray;
+	height: 5px;
+	pointer-events:none;
+}
+
+#divRule span{
+	font-size:12px;
+    position: relative;
+    top: -15px;
+}
+
+#divInfo{
+	font-size:12px; position: absolute; bottom:5px; left:5px;
+	pointer-events:none;
+}
+
+#divLoading{
+	width: 100px;
+	height: 15px;
+	margin: 0 auto;
+	margin-left:-50px;
+	position: absolute;
+	top:45%;
+	left:50%;
+	pointer-events:none;
+}
+
+#divLoading span{
+	display: inline-block;
+	width: 15px;
+	height: 100%;
+	margin-right: 5px;
+	border-radius: 50%;
+	background: lightgreen;
+	-webkit-animation: load 1.04s ease infinite;
+}
+#divLoading span:last-child{
+	margin-right: 0px; 
+}
+@-webkit-keyframes load{
+	0%{
+		opacity: 1;
+		-webkit-transform: scale(1.3);
+	}
+	100%{
+		opacity: 0.2;
+		-webkit-transform: scale(.3);
+	}
+}
+#divLoading span:nth-child(1){
+	-webkit-animation-delay:0.13s;
+}
+#divLoading span:nth-child(2){
+	-webkit-animation-delay:0.26s;
+}
+#divLoading span:nth-child(3){
+	-webkit-animation-delay:0.39s;
+}
+#divLoading span:nth-child(4){
+	-webkit-animation-delay:0.52s;
+}
+#divLoading span:nth-child(5){
+	-webkit-animation-delay:0.65s;
+}
+
+#divTrackPauseCount{
+	display: none;
+	position: absolute; bottom:10px;
+	font-size: 12px;
+    color: red;
+    width: 100%;
+    text-align: center;
+}

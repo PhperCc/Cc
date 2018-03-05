@@ -1,0 +1,20 @@
+<h1>服务列表</h1>
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>Name</th>
+        <th>protocol</th>
+        <th>Description</th>
+    </tr>
+    { foreach from=$starters item=services key=starter_name }
+    <tr>
+        <td colspan="4"><b>{ $starter_name }</b></td>
+    </tr>
+    { foreach from=$services item=service }
+    <tr>
+        <td>{ $service.name }</td>
+        <td>{ $service.protocol }</td>
+        <td>{ $service.desc }</td>
+    </tr>
+    { /foreach }
+    { /foreach }
+</table>

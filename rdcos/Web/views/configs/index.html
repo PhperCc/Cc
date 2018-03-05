@@ -1,0 +1,113 @@
+<form id="frmItem" class="form-horizontal" method="get">
+<input type="hidden" name="um" value="{ $model }" />
+<input type="hidden" name="ua" value="{ $action }" />
+<div class="control-group">
+    <span>选择配置文件: </span>
+    <select id="config_name" name="config_name">
+        <option value="sys">SysConfig</option>
+        { foreach from=$services item=service }
+        <option value="{ $service }">{ $service }</option>
+        { /foreach }
+    </select>
+    <input class='btn btn-success' type='button' id='btnSave' value='提交保存' />
+    <span class="label label-warning">* 除非明确知道修改的后果， 否则不要擅自改动配置， 所有配置升级后不会被覆盖</span>
+</div>
+<table class="table table-bordered table-hover">
+    <thead>
+    <tr>
+        <th>路径</th>
+        <th>说明</th>
+        <th>类型</th>
+        <th>值</th>
+    </tr>
+    </thead>
+    { foreach from=$config_infos item=config key=path }
+    <tr>
+        <td style='font-weight:bold;'>{ $path }</td>
+        <td>{ $config.desc }</td>
+        <td>{ $config.data_type }</td>
+        <td>
+        { if $config.allow_edit }
+        { if $config.data_type eq 'string' }
+            <input type='text' ovalue='{ $config.value }' value='{ $config.value }' path='{ $path }' data_type='{ $config.data_type }' class='config_key input-xlarge' />
+        { elseif $config.data_type eq 'int' }
+            <input type='number' step='any' ovalue='{ $config.value }' value='{ $config.value }' path='{ $path }' data_type='{ $config.data_type }' class='config_key input-xlarge' />
+        { elseif $config.data_type eq 'float' }
+            <input type='number' step='any' ovalue='{ $config.value }' value='{ $config.value }' path='{ $path }' data_type='{ $config.data_type }' class='config_key input-xlarge' />
+        { elseif $config.data_type eq 'bool' }
+            <select ovalue='{ $config.value }' path='{ $path }' data_type='{ $config.data_type }' class='config_key input-small'>
+                <option value='1' { if $config.value }selected{ /if }>TRUE</option>
+                <option value='0' { if not $config.value }selected{ /if }>FALSE</option>
+            </select>
+        { /if }
+        <span class='help-inline'></span>
+        { else }
+        <span class="uneditable-input input-xlarge">{ $config.value }</span>
+        { /if }
+        </td>
+    </tr>
+    { /foreach }
+</table>
+</form>
+
+<script type="text/javascript" src='./public/js/ServiceApi.js'></script>
+<script type="text/javascript">
+$(function(){
+    $('#config_name').val('{ $config_name }');
+
+    $('#config_name').change(function(){
+        $('#frmItem').submit();
+    });
+
+    $('#btnSave').click(function(){
+        var $api_action = 'ServiceConfig.set';
+        var $api_params = {};
+        var $module = null, $service = null;
+
+        var $config_name = $('#config_name').val();
+        if($config_name == 'sys') $api_action = 'SysConfig.set';
+        else if($config_name == 'Core')
+        {
+            var $module_service = $config_name.split('/');
+            $module = 'System';
+            $service = $module_service[1]; 
+        }
+        else
+        {
+            var $module_service = $config_name.split('/');
+            $module = $module_service[0];
+            $service = $module_service[1];
+        }
+
+        $('.config_key').each(function(){
+            var $val = $(this).val();
+            var $oval = $(this).attr('ovalue');
+            if($val == $oval) return;
+
+            var $data_type = $(this).attr('data_type');
+            switch($data_type)
+            {
+                case 'int': $val = parseFloat($val); break;
+                case 'float': $val = parseFloat($val); break;
+                case 'bool': $val = $val == '1'; break;
+            }
+            
+            var $api_params = {'module': $module, 'service': $service, 'key': $(this).attr('path'), 'val': $val};  
+            
+            $(this).next('span').show().html('正在保存...');
+            $(this).attr('reqSeq', ServiceApi.request($api_action, $api_params, function($reqSeq, $result, $info, $data){
+                var o = $('[reqSeq=' + $reqSeq + ']');
+                if($result)
+                {
+                    o.attr('ovalue', o.val());
+                    o.next('span').html('已保存').fadeOut(2000);
+                }
+                else
+                {
+                    o.next('span').html('保存失败: ' + $info);
+                }
+            }));
+        });
+    });
+});
+</script>

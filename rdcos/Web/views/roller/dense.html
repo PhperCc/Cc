@@ -1,0 +1,321 @@
+<style type="text/css">
+
+</style>
+<div class="left">
+    <div id="chart" style="height:500px; width: 100%"></div>
+</div>
+<div class="right">
+<form class="form-horizontal" id="form" name="form" onsubmit="return false;">
+
+    <div class="control-group">
+        <label for="customer_name" class="control-label">压路机类型: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+                <input type="radio" name="zn_type" id="zn_type" value="0" checked /> 30T及以下压路机
+            </label>
+            <label>
+                <input type="radio" name="zn_type" id="zn_type" value="1"  /> 32T压路机
+            </label>
+            <label>
+                <input type="radio" name="zn_type" id="zn_type" value="2" /> 36T压路机
+            </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="customer_name" class="control-label">激振力计算方式: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+                <input type="radio" name="force_type" id="force_type" value="0" checked /> 振幅计算方式
+            </label>
+            <label>
+                <input type="radio" name="force_type" id="force_type" value="1"  /> 中大振频计算方式
+            </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="customer_name" class="control-label">最大激振力: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+            <input type="number" step="1" max="1000" class="input-small" id="max_force" value="800" /><span class="add-on">KN</span>
+            <span class="help-inline updown"></span>
+            </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="customer_name" class="control-label">最大振频: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+            <input type="number" step="1" max="50" class="input-small" id="max_hz" value="28" /><span class="add-on">HZ</span>
+            <span class="help-inline updown"></span>
+            </label>
+        </div>
+    </div>
+
+
+    <div class="control-group">
+        <label for="customer_name" class="control-label">频率系数: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+            <input type="number" step="0.1" max="10" class="input-small" id="ratio_freq" value="0.8" /><span class="add-on"></span>
+            <input type="button" id="btn_calc_ratiofreq" class="btn btn-success" value="计算频率系数" />
+            </label>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label for="customer_name" class="control-label">振幅阀值: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+            <input type="number" step="1" max="1000" class="input-small" id="min_amp" value="300" /><span class="add-on"></span>
+            <input type="button" id="btn_record_ratioamp" class="btn btn-warning" value="记录阀值" />
+            </label>
+        </div>
+    </div>
+
+<div class="control-group">
+        <label for="customer_name" class="control-label">最大振幅: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+            <input type="number" step="1" max="1000" class="input-small" id="max_amp" value="700" /><span class="add-on"></span>
+            <input type="button" id="btn_record_maxamp" class="btn btn-warning" value="计算振幅最大值" />
+            </label>
+        </div>
+    </div>
+    
+    
+    <div class="control-group">
+        <label for="customer_name" class="control-label">ecv调整系数: </label>
+        <div class="controls input-append" style="display:block;">
+            <label>
+            <input type="number" step="0.01" max="10.00" readonly="false" class="input-small" id="ratio_ecv"  value="1" /><span class="add-on"></span>
+            <input type="button" id="btn_calc_ratioecv" class="btn btn-danger" value="计算ecv系数" />
+            </label>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <input type="button" id="btn_submit" class="btn btn-primary" value="提交数据" /> &nbsp;&nbsp;
+        <span class="label" id="tip"></span>
+    </div>
+
+</form>
+    
+</div>
+
+<style type="text/css">
+.led{margin-right:5px;}
+</style>
+<script src="./js/ServiceApi.js"></script>
+<script src="./js/echarts.min.js"></script>
+
+
+<script type="text/javascript">
+var data_amp;
+var data_freq;
+var data_ecv;
+
+//计算频率系数
+$('#btn_calc_ratiofreq').click(function(){
+    // 
+    sum = 0;
+    console.log(data_freq);
+    for(i in data_freq)
+    {
+        sum += data_freq[i];
+    }
+    freq = sum/data_freq.length;
+    console.log(data_freq.length);
+    if(freq != 0)
+    $('#ratio_freq').val(freq/$('#max_hz').val());
+
+});
+//记录振幅阀值
+$('#btn_record_ratioamp').click(function(){
+    $('#min_amp').val();
+    // console.log(data_amp);
+    amp = 1000;
+    for(i in data_amp)
+    {
+        amp = Math.min(data_amp[i],amp);
+    }
+    $('#min_amp').val(Math.round(amp));
+    console.log(amp);
+});
+
+
+
+$('#btn_record_maxamp').click(function(){
+    max_amp = 0;
+    sum_amp = 0;
+    amp = 0;
+    for(i in data_amp)
+    {
+        max_amp = Math.max(data_amp[i],amp);
+        sum_amp += data_amp[i];
+    }
+    avg_amp = sum_amp/data_amp.length;
+    amp = Math.round((avg_amp +max_amp)/2);
+    $('#max_amp').val(amp);
+    console.log(amp);
+});
+
+$('#btn_calc_ratioecv').click(function(){
+    max = 0;
+    for(i in data_ecv)
+    {
+        max = Math.max(max,data_ecv[i]);
+    }
+    if(max != 0)
+        $("#ratio_ecv").val(80/max);
+});
+
+$('#btn_submit').click(function(){
+ServiceApi.request("ServiceConfig.set",{"module": "Roller", "service": "DenseCan2", "key": "zn_type", "val": $('#zn_type:checked').val()},function(){});
+ServiceApi.request("ServiceConfig.set",{"module": "Roller", "service": "DenseCan2", "key": "max_force", "val": $('#max_force').val()},function(){});
+ServiceApi.request("ServiceConfig.set",{"module": "Roller", "service": "DenseCan2", "key": "max_hz", "val": $('#max_hz').val()},function(){});
+ServiceApi.request("ServiceConfig.set",{"module": "Roller", "service": "DenseCan2", "key": "ratio_freq", "val": $('#ratio_freq').val()},function(){});
+ServiceApi.request("ServiceConfig.set",{"module": "Roller", "service": "DenseCan2", "key": "min_amp", "val": $('#min_amp').val()},function(){});
+ServiceApi.request("ServiceConfig.set",{"module": "Roller", "service": "DenseCan2", "key": "max_amp", "val": $('#max_amp').val()},function(){});
+ServiceApi.request("ServiceConfig.set",{"module": "Roller", "service": "DenseCan2", "key": "ratio_ecv", "val": $('#ratio_ecv').val()},function(){});
+ServiceApi.request("ServiceConfig.set",{"module": "Roller", "service": "DenseCan2", "key": "force_type", "val": $('#force_type:checked').val()},function(){});
+$('#btn_submit').prop('disabled', true);    // 禁止重复提交
+});
+
+
+function tip($msg)
+{
+    $('#tip').show().html($msg).stop().show().css('opacity', 1).fadeOut(2000);
+}
+
+
+var myChart = echarts.init(document.getElementById('chart'));
+option = {
+    title: {
+        text: 'ENH-密实度',
+        subtext: '实时图形'
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+            type: 'cross',
+            label: {
+                backgroundColor: '#283b56'
+            }
+        }
+    },
+    legend: {
+        data:['ecv' , '振频' , '振幅']
+    },
+    toolbox: {
+        show: true,
+        feature: {
+            dataView: {readOnly: false},
+        }
+    },
+    dataZoom: {
+        show: false,
+        start: 0,
+        end: 100
+    },
+    xAxis: {
+            type: 'category',
+            boundaryGap: true,
+            data: (function (){
+                var now = new Date();
+                var res = [];
+                var len = 100;
+                while (len--) {
+                    res.unshift(now.toLocaleTimeString().replace(/^\D*/,''));
+                    now = new Date(now - 100);
+                }
+                return res;
+            })()
+        },
+    yAxis: [
+        {
+            type: 'value',
+            scale: true,
+            name: 'ECV,振频',
+            max: 30,
+            min: 0,
+            boundaryGap: [0.2, 0.2]
+        },
+        {
+            type: 'value',
+            scale: true,
+            name: '振幅',
+            max: 1200,
+            min: 0,
+            boundaryGap: [0.2, 0.2]
+        }
+    ],
+    series: [    
+        {
+            name:'ecv',
+            type:'line',
+            data:(function (){
+                var res = [];
+                var len = 0;
+                while (len < 100) {
+                    res.push(0);
+                    len++;
+                }
+                return res;
+            })()
+        },
+        {
+            name:'振频',
+            type:'line',
+            yAxisIndex: 0,
+            data:(function (){
+                var res = [];
+                var len = 100;
+                while (len--) {
+                    res.push(0);
+                }
+                return res;
+            })()
+        },
+        {
+            name:'振幅',
+            type:'line',
+            yAxisIndex:1,
+            data:(function (){
+                var res = [];
+                var len = 0;
+                while (len < 100) {
+                    res.push(0);
+                    len++;
+                }
+                return res;
+            })()
+        }
+    ]
+};
+
+
+
+ServiceApi.request("Cache.get", {"key": "Sensor:Dense:data"}, function($seq, $result, $info, $data){
+    if(!$result || !$data) return tip("没有密实度数据");
+
+    axisData = (new Date()).toLocaleTimeString().replace(/^\D*/,'');
+
+    data_amp = option.series[2].data;
+    data_freq = option.series[1].data;
+    data_ecv = option.series[0].data;
+
+    data_amp.shift();
+    data_amp.push($data.amp);
+    data_freq.shift();
+    data_freq.push($data.freq);
+    data_ecv.shift();
+    data_ecv.push($data.ecv);
+
+    option.xAxis.data.shift();
+    option.xAxis.data.push(axisData);
+
+    myChart.setOption(option);
+
+}, 200);
+
+</script>
